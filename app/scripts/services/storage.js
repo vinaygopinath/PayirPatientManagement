@@ -21,8 +21,9 @@ angular.module('PayirPatientManagement')
             }
             var Datastore = require('nedb');
             var path = require('path');
+            //            require('nw.gui').App.dataPath
             _cachedDb = new Datastore({
-                filename: path.join(require('nw.gui').App.dataPath, 'ppm.db')
+                filename: path.join('Hello', 'ppm.db')
             });
             _cachedDb.loadDatabase(function (err) {
                 if (err) {

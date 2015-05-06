@@ -3,7 +3,7 @@
 describe('Controller: SettingsCtrl', function () {
 
     // load the controller's module
-    beforeEach(module('PayirPatientManagement'));
+    beforeEach(angular.mock.module('PayirPatientManagement'));
 
     var SettingsCtrl,
         scope;

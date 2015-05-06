@@ -193,32 +193,11 @@ module.exports = function (grunt) {
             }
         },
 
-        connect: {
-            options: {
-                port: 9000,
-                livereload: 35729,
-                // change this to '0.0.0.0' to access the server from outside
-                hostname: 'localhost',
-                open: false,
-                base: [
-                    'test',
-                    '<%= config.app %>'
-                    ]
-            }
-        },
-        jasmine: {
-            all: {
-                src: ['app/scripts/{,*/}*.js',
-                      '!app/scripts/main.js'],
-                options: {
-                    specs: 'test/spec/{,*/}*.js',
-                    vendor: ['app/bower_components/angular/angular.js',
-                             'app/bower_components/angular-animate/angular-animate.js',
-                             'app/bower_components/angular-aria/angular-aria.js',
-                             'app/bower_components/angular-route/angular-route.js',
-                             'app/bower_components/angular-material/angular-material.js',
-                            'app/bower_components/angular-mocks/angular-mocks.js']
-                }
+
+        karma: {
+            unit: {
+                configFile: 'test/karma.conf.js',
+                logLevel: 'DEBUG'
             }
         }
         //        useminPrepare: {
@@ -380,8 +359,8 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test', [
     'jshint',
-    'connect',
-    'jasmine'
+//    'connect',
+    'karma'
   ]);
 
 };

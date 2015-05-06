@@ -3,7 +3,7 @@
 describe('Controller: PatientListCtrl', function () {
 
     // load the controller's module
-    beforeEach(module('PayirPatientManagement'));
+    beforeEach(angular.mock.module('PayirPatientManagement'));
 
     var PatientListCtrl,
         scope;

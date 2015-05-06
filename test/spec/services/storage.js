@@ -1,16 +1,17 @@
 'use strict';
 
+require('nedb');
 describe('Service: StorageService', function () {
 
     // load the service's module
-    beforeEach(module('PayirPatientManagement'));
+    beforeEach(angular.mock.module('PayirPatientManagement'));
 
     // instantiate service
     var StorageService, VldService, rootScope;
-    beforeEach(inject(function ($rootScope, _StorageService_, _VldService_) {
-        rootScope = $rootScope;
-        StorageService = _StorageService_;
-        VldService = _VldService_;
+    beforeEach(inject(function ($rootScope, $injector) {
+        rootScope = $rootScope.$new();
+        StorageService = $injector.get('StorageService');
+        VldService = $injector.get('VldService');
     }));
 
     describe('openDatabase', function () {

@@ -3,7 +3,7 @@
 describe('Service: VldService', function () {
 
     // load the service's module
-    beforeEach(module('PayirPatientManagement'));
+    beforeEach(angular.mock.module('PayirPatientManagement'));
 
     // instantiate service
     var VldService;
