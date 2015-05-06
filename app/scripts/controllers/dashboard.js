@@ -14,5 +14,5 @@ angular.module('PayirPatientManagement')
       'AngularJS',
       'Karma'
     ];
-        console.log("Hello");
+        console.log('Hello');
     });

@@ -3,4 +3,5 @@ app/bower_components/
 resources/
 dist/
 tmp/
-.DS_Store
+.DS_Store/.project
+/.project
