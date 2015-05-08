@@ -11,7 +11,7 @@ describe('Service: VldService', function () {
         VldService = _VldService_;
     }));
 
-    describe('isValidPatient', function () {
+    describe('Patient validation', function () {
         it('should be defined', function () {
             expect(!!VldService).toBe(true);
         });
@@ -60,13 +60,14 @@ describe('Service: VldService', function () {
         });
     });
 
-    describe('isValidVisit', function () {
+    describe('Visit validation', function () {
         it('should be defined', function () {
             expect(!!VldService.isValidVisit).toBe(true);
         });
 
-        it('should require a date and issue', function () {
+        it('should require a regNum, date and issue', function () {
             var someValidVisit = {
+                regNum: '2222',
                 date: new Date(),
                 issue: 'Headache'
             };
@@ -77,6 +78,36 @@ describe('Service: VldService', function () {
 
             expect(VldService.isValidVisit(someValidVisit)).toBeTruthy();
             expect(VldService.isValidVisit(invalidVisit)).toBeFalsy();
+        });
+    });
+
+    describe('Settings validation', function () {
+        it('should be defined', function () {
+            expect(!!VldService.isValidSettings).toBe(true);
+        });
+
+        it('should require team information and timestamp of last sync', function () {
+            var someValidSettings = {
+                team: [{
+                    name: 'PersonA',
+                    email: 'person.a@email.com'
+                }, {
+                    name: 'PersonB',
+                    email: 'personb@mail.com'
+                }],
+                lastSync: new Date(0)
+            };
+
+            var someInvalidSettings = {
+                team: [{
+                    irrelevantProperty: 'Person',
+                    age: 32
+                }],
+                lastSync: new Date(0)
+            };
+
+            expect(VldService.isValidSettings(someValidSettings)).toBeTruthy();
+            expect(VldService.isValidSettings(someInvalidSettings)).toBeFalsy();
         });
     });
 });

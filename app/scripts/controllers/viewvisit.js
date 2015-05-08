@@ -2,16 +2,25 @@
 
 /**
  * @ngdoc function
- * @name PayirPatientManagement.controller:ViewvisitCtrl
+ * @name PayirPatientManagement.controller:ViewVisitCtrl
  * @description
- * # ViewvisitCtrl
+ * # ViewVisitCtrl
  * Controller of the PayirPatientManagement
  */
 angular.module('PayirPatientManagement')
-    .controller('ViewVisitCtrl', function ($scope) {
-        $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
+    .controller('ViewVisitCtrl', function ($scope, $routeParams, StorageService) {
+
+
+        $scope.visit = {};
+
+        if (!$routeParams.visitId) {
+            $scope.isMissingId = true;
+            return;
+        }
+
+        StorageService.getVisit($routeParams.visitId).then(function (visit) {
+            $scope.visit = visit;
+        }, function () {
+            $scope.hasError = true;
+        });
     });

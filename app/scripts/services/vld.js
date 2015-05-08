@@ -25,15 +25,32 @@ angular.module('PayirPatientManagement')
 
         function isValidVisit(visit) {
             if (visit) {
+                var valRegNum = visit.regNum && visit.regNum.trim().length > 0;
                 var valDate = visit.date && visit.date instanceof Date;
                 var valIssue = visit.issue && visit.issue.trim().length > 2;
-                return valDate && valIssue;
+                return valRegNum && valDate && valIssue;
+            }
+            return false;
+        }
+
+        function isValidSettings(settings) {
+            if (settings) {
+                var valTeam = false;
+                if (settings.team) {
+                    valTeam = true;
+                    angular.forEach(settings.team, function (personDetails) {
+                        valTeam = valTeam && (personDetails.name && personDetails.name.trim().length > 2);
+                    });
+                }
+                var valLastSync = settings.lastSync && settings.lastSync instanceof Date;
+                return valTeam && valLastSync;
             }
             return false;
         }
 
         return {
             'isValidPatient': isValidPatient,
-            'isValidVisit': isValidVisit
+            'isValidVisit': isValidVisit,
+            'isValidSettings': isValidSettings
         };
     });

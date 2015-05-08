@@ -1,4 +1,4 @@
-angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial'])
+angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 'ngDialog'])
     .config(function ($routeProvider) {
         'use strict';
         $routeProvider.when('/patient/new', {

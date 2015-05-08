@@ -68,7 +68,7 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            files: '<%= config.app %>/scripts/{,*/}*.js'
+            files: ['<%= config.app %>/scripts/{,*/}*.js', 'test/spec/{,*/}*.js']
         },
         copy: {
             appLinux: {
@@ -197,7 +197,7 @@ module.exports = function (grunt) {
         karma: {
             unit: {
                 configFile: 'test/karma.conf.js',
-                logLevel: 'DEBUG'
+                logLevel: 'INFO'
             }
         }
         //        useminPrepare: {
