@@ -14,9 +14,16 @@ module.exports = function (karma) {
         '../app/bower_components/angular-material/angular-material.js',
         '../app/bower_components/angular-mocks/angular-mocks.js',
         '../app/bower_components/ngDialog/js/ngDialog.js',
+        '../app/bower_components/angular-messages/angular-messages.js',
         '../app/scripts/{,*/}*.js',
         'spec/{,*/}*.js'
-    ],
+//            'spec/services/storage.js'
+        ],
+
+        //Needed to prevent random PhantomJS errors
+        //Refer: https://github.com/karma-runner/karma/issues/598
+
+        browserNoActivityTimeout: 60000,
 
 
         reporters: ['mocha'],

@@ -1,1 +1,67 @@
-<p>This is the settings view.</p>
+<h2>Settings  
+    <md-button class="md-fab md-primary md-mini" aria-label="Save" ng-click="saveSettings(settings)">
+    <md-icon md-svg-src="images/ic_save_24px.svg"></md-icon>
+    </md-button>
+</h2>
+<md-card ng-show="hasError">
+    <md-card-content>
+        <p class="md-warn">Error loading app settings. Please refresh this app!</p>
+    </md-card-content>
+</md-card>
+<md-card ng-show="!hasError">
+    <md-card-content>
+        <div layout="column">
+            <h4>Team</h4>
+            <form name="teamForm">
+                <div ng-repeat="person in settings.team track by $index" layout="row">
+                    <md-input-container flex="45">
+                        <label>Name</label>
+                        <input name="name{{$index}}" ng-model="person.name" md-maxlength="50" md-minlength="3" required>
+                        <ng-messages for="teamForm.name{{$index}}.$error" ng-messages-include="views/errormsgs.html">
+                        </ng-messages>
+                    </md-input-container>
+                    <md-input-container flex="45">
+                        <label>Email</label>
+                        <input ng-model="person.email">
+                    </md-input-container>
+                    <md-button class="md-icon-button" aria-label="Delete" ng-click="settings.team.splice($index,1)">
+                        <md-icon md-svg-icon="images/ic_delete_24px.svg"></md-icon>
+                    </md-button>
+                </div>
+                <h4>New team member</h4>
+                <div layout="row">
+                    <md-input-container flex="45">
+                        <label>Name</label>
+                        <input name="newname" ng-model="newPerson.name" md-maxlength="50" md-minlength="3" required>
+                        <ng-messages for="teamForm.newname.$error" ng-messages-include="views/errormsgs.html" ng-if="teamForm.newname.$dirty">
+                        </ng-messages>
+                    </md-input-container>
+                    <md-input-container flex="45">
+                        <label>Email</label>
+                        <input ng-model="newPerson.email">
+                    </md-input-container>
+                    <md-button class="md-icon-button" aria-label="Add" ng-click="addPersonToTeam(newPerson)">
+                        <md-icon md-svg-icon=" images/ic_add_circle_24px.svg "></md-icon>
+                    </md-button>
+                </div>
+            </form>
+        </div>
+    </md-card-content>
+</md-card>
+<md-card ng-show="!hasError">
+    <md-card-content>
+        <h4>Google Drive Backup (Sync)</h4>
+        <p>Last synced: {{ settings.lastSync ? (settings.lastSync | date: 'dd MMM yy, hh:mm a') : 'Never' }}</p>
+        <p>
+            <md-button class="md-raised">
+                <label>Sync now</label>
+            </md-button>
+        </p>
+    </md-card-content>
+</md-card>
+<div layout="row" layout-sm="column" ng-show="!hasError">
+    <md-button class="md-raised md-primary" ng-click="saveSettings(settings)">
+        <label>Save changes</label>
+    </md-button>
+    <p class="md-warn" ng-show="hasValErrors">Some inputs are invalid. Please correct them and try again</p>
+</div>

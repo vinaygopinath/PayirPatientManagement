@@ -26,6 +26,8 @@
         "beforeEach": true,
         "spyOn": true,
         "expect": true,
-        "inject": true
+        "inject": true,
+        "xdescribe": true,
+        "xit": true
     }
 }

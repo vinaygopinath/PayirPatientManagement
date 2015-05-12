@@ -1,0 +1,28 @@
+/* The X icon in the sidebar to clear search (patientlist.html) */
+
+.clear-icon {
+    position: absolute;
+    right: -80%;
+    top: 25%;
+}
+/* Error messages (patientlist.html etc) */
+
+p.md-warn {
+    color: #D32F2F;
+}
+/* Warning messages (patientlist.html) */
+
+p.md-accent {
+    color: #FF5722;
+}
+/* Error and warning messages for ngmessages (to mimic material css) */
+
+md-radio-group.ng-message {
+    font-size: 0.75em;
+    color: #D32F2F;
+}
+
+.warning-message {
+    font-size: 0.75em;
+    color: #FF982D;
+}

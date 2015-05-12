@@ -10,13 +10,14 @@
 angular.module('PayirPatientManagement')
     .controller('PatientListCtrl', function ($scope, StorageService) {
 
-        $scope.patients = {};
+        $scope.patients = [];
         $scope.searchStr = '';
 
-        StorageService.getPatients(true).then(function (patients) {
-            $scope.patients = patients;
-        }, function () {
+
+        StorageService.getPatients(true).then(null, function () {
             $scope.hasError = true;
+        }, function (addedPatient) {
+            $scope.patients = $scope.patients.concat(addedPatient);
         });
 
         $scope.search = function (item) {
@@ -26,7 +27,6 @@ angular.module('PayirPatientManagement')
                 var result = true;
                 for (var partIndex in query) {
                     if (jsonStr.indexOf(angular.lowercase(query[partIndex])) > -1) {
-                        //console.log("Returning true for query " + query[partIndex] + ". Item = ", jsonStr);
                         result = result && true;
                     } else {
                         result = false;
@@ -34,7 +34,6 @@ angular.module('PayirPatientManagement')
                 }
                 return result;
             } else {
-                //console.log("Empty queryStr, so true for everything!");
                 return true;
             }
         };

@@ -14,24 +14,24 @@ describe('Controller: ViewPatientCtrl', function () {
     };
 
     var someValidPatientObj = {
-        regNum: someExistingPatientId,
+        id: someExistingPatientId,
         gender: 1,
         name: 'Some Name',
         age: 30,
-        contactNum1: '1234567890',
+        contactNum: '1234567890',
         village: 'Thenur'
     };
 
     var someValidVisits = [{
-        regNum: someExistingPatientId,
+        id: someExistingPatientId,
         date: new Date(),
         issue: 'Headache'
                 }, {
-        regNum: someExistingPatientId,
+        id: someExistingPatientId,
         date: new Date(0),
         issue: 'Fever'
                 }, {
-        regNum: someExistingPatientId,
+        id: someExistingPatientId,
         date: new Date(),
         issue: 'Snake bite'
                 }];

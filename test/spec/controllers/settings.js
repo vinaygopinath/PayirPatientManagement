@@ -98,4 +98,60 @@ describe('Controller: SettingsCtrl', function () {
         });
     });
 
+    describe('Team members', function () {
+
+        it('should have an empty person object (for new team member details)', function () {
+            expect(scope.newPerson).toEqual({});
+        });
+
+        it('should allow storing new team members', function () {
+            expect(!!scope.addPersonToTeam).toBe(true);
+        });
+
+        it('should update the new team member in the local settings and reset the person object', function () {
+            scope.settings = someSettingObj;
+            var newPerson = {
+                name: 'ABCD',
+                email: 'pqrs@email.com'
+            };
+
+            scope.addPersonToTeam(newPerson);
+
+            var updatedSettings = someSettingObj;
+            updatedSettings.team.push(newPerson);
+            expect(scope.settings).toEqual(updatedSettings);
+            expect(scope.newPerson).toEqual({});
+        });
+
+        it('should have a function to check for uniqueness of new person', function () {
+            expect(!!scope.isUniquePerson).toBe(true);
+        });
+
+        it('should check that the new person object is unique', function () {
+            spyOn(scope, 'isUniquePerson');
+            var newPerson = {
+                name: 'ABCD',
+                email: 'pqrs@email.com'
+            };
+            scope.addPersonToTeam(newPerson);
+            expect(scope.isUniquePerson).toHaveBeenCalled();
+        });
+
+        it('unique check function should check based on name and email', function () {
+            var somePerson = {
+                name: 'ABCD',
+                email: 'abcd@email.com'
+            };
+            scope.settings = [somePerson];
+            var duplicatePerson = somePerson;
+            var someOtherPerson = {
+                name: 'PQRS',
+                email: 'pqrs@email.com'
+            };
+
+            expect(scope.isUniquePerson(duplicatePerson, scope.settings)).toBeFalsy();
+            expect(scope.isUniquePerson(someOtherPerson, scope.settings)).toBeTruthy();
+        });
+
+    });
 });

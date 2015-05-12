@@ -5,9 +5,9 @@
     "single-instance": true,
     "window": {
         "title": "PayirPatientManagement",
-        "width": 650,
+        "width": 1000,
         "height": 650,
-        "min_width": 650,
+        "min_width": 1000,
         "min_height": 650,
         "toolbar": true
     },

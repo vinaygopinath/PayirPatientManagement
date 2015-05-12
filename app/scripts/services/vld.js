@@ -12,22 +12,28 @@ angular.module('PayirPatientManagement')
 
         function isValidPatient(patient) {
             if (patient) {
-                var valRegNum = patient.regNum && patient.regNum.trim().length > 0;
+                var valId = patient.id && patient.id.trim().length >= 1;
                 var valGender = patient.gender && patient.gender > 0 && patient.gender < 3;
-                var valName = patient.name && patient.name.trim().length > 2;
-                var valAge = patient.age && patient.age >= 0 && patient.age < 120;
-                var valContactNum1 = patient.contactNum1 && patient.contactNum1.trim().length > 5;
-                var valVillage = patient.village && patient.village.trim().length > 2;
-                return (valRegNum && valGender && valName && valAge && valContactNum1 && valVillage);
+                var valName = patient.name && patient.name.trim().length >= 3;
+                var valAge = patient.age && patient.age >= 0 && patient.age <= 110;
+                var valContactNum = patient.contactNum && patient.contactNum.trim().length >= 5;
+                var valVillage = patient.village && patient.village.trim().length >= 3;
+                //                console.log('ID', valId);
+                //                console.log('gender', valGender);
+                //                console.log('name', valName);
+                //                console.log('age', valAge);
+                //                console.log('contact num', valContactNum);
+                //                console.log('village', valVillage);
+                return (valId && valGender && valName && valAge && valContactNum && valVillage);
             }
             return false;
         }
 
         function isValidVisit(visit) {
             if (visit) {
-                var valRegNum = visit.regNum && visit.regNum.trim().length > 0;
+                var valRegNum = visit.id && visit.id.trim().length > 0;
                 var valDate = visit.date && visit.date instanceof Date;
-                var valIssue = visit.issue && visit.issue.trim().length > 2;
+                var valIssue = visit.issue && visit.issue.trim().length >= 3;
                 return valRegNum && valDate && valIssue;
             }
             return false;
@@ -38,12 +44,18 @@ angular.module('PayirPatientManagement')
                 var valTeam = false;
                 if (settings.team) {
                     valTeam = true;
-                    angular.forEach(settings.team, function (personDetails) {
-                        valTeam = valTeam && (personDetails.name && personDetails.name.trim().length > 2);
+                    angular.forEach(settings.team, function (person) {
+                        valTeam = valTeam && isValidPerson(person);
                     });
                 }
-                var valLastSync = settings.lastSync && settings.lastSync instanceof Date;
-                return valTeam && valLastSync;
+                return valTeam;
+            }
+            return false;
+        }
+
+        function isValidPerson(person) {
+            if (person) {
+                return person.name && person.name.trim().length >= 3;
             }
             return false;
         }
@@ -51,6 +63,7 @@ angular.module('PayirPatientManagement')
         return {
             'isValidPatient': isValidPatient,
             'isValidVisit': isValidVisit,
-            'isValidSettings': isValidSettings
+            'isValidSettings': isValidSettings,
+            'isValidPerson': isValidPerson
         };
     });

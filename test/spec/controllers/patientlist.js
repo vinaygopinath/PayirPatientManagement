@@ -9,17 +9,17 @@ describe('Controller: PatientListCtrl', function () {
         scope;
 
     var someValidPatientObjs = [{
-        regNum: '12345',
+        id: '12345',
         name: 'Some Name',
         village: 'Thenur',
         gender: 1
     }, {
-        regNum: '5678',
+        id: '5678',
         name: 'Another Person',
         village: 'Thenur',
         gender: 2
     }, {
-        regNum: '9876',
+        id: '9876',
         name: 'Third Person',
         village: 'Edumalai',
         gender: 1

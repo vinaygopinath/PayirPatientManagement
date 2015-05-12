@@ -8,11 +8,14 @@
  * Controller of the PayirPatientManagement
  */
 angular.module('PayirPatientManagement')
-    .controller('DashboardCtrl', function ($scope) {
-        $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-        console.log('Hello');
+    .controller('DashboardCtrl', function ($scope, StorageService) {
+        $scope.info = {};
+        $scope.hasError = false;
+
+        StorageService.getDashboardInfo().then(function (dashboardInfo) {
+            $scope.info = dashboardInfo;
+        }, function (err) {
+            console.log(err);
+            $scope.hasError = true;
+        });
     });

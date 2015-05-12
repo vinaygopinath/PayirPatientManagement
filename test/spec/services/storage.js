@@ -3,8 +3,13 @@
 require('nedb');
 describe('Service: StorageService', function () {
 
+    var PATIENT_DB = 'patient.db';
+    var VISIT_DB = 'visit.db';
+    var SETTINGS_DB = 'settings.db';
+
     // load the service's module
     beforeEach(angular.mock.module('PayirPatientManagement'));
+
 
     // instantiate service
     var StorageService, VldService, rootScope, q;
@@ -97,6 +102,27 @@ describe('Service: StorageService', function () {
                 StorageService.getPatient();
             }).toThrow();
         });
+
+        it('should be defined', function () {
+            expect(!!StorageService.getSettings).toBe(true);
+        });
+
+        xit('should open the patient database', function () {
+            var fakeDb = {
+                findOne: function () {}
+            };
+            var fakeSucPromise = {
+                then: function (callback) {
+                    callback(fakeDb);
+                }
+            };
+            var somePatientId = '1234';
+            var openDatabase = jasmine.createSpy('openDatabase');
+            console.log(openDatabase);
+            //spyOn(StorageService, 'openDatabase').and.returnValue(fakeSucPromise);
+            StorageService.getPatient(somePatientId);
+            expect(openDatabase).toHaveBeenCalledWith(PATIENT_DB);
+        });
     });
 
     describe('savePatient', function () {
@@ -127,11 +153,11 @@ describe('Service: StorageService', function () {
 
         it('should work for valid objects', function () {
             var someValidPatientObj = {
-                regNum: '12345',
+                id: '12345',
                 gender: 1,
                 name: 'Some Name',
                 age: 30,
-                contactNum1: '1234567890',
+                contactNum: '1234567890',
                 village: 'Thenur'
             };
 
@@ -149,8 +175,22 @@ describe('Service: StorageService', function () {
     });
 
     describe('Get settings', function () {
+        var fakeDb = {
+            find: function () {}
+        };
+        var fakeSucPromise = {
+            then: function (callback) {
+                callback(fakeDb);
+            }
+        };
+
         it('should be defined', function () {
             expect(!!StorageService.getSettings).toBe(true);
+        });
+
+        xit('should open the settings database', function () {
+            spyOn(StorageService, 'openDatabase').and.returnValue(fakeSucPromise);
+            expect(StorageService.openDatabase).toHaveBeenCalledWith(SETTINGS_DB);
         });
     });
 
@@ -180,4 +220,83 @@ describe('Service: StorageService', function () {
             rootScope.$digest();
         });
     });
+
+    //TODO Mock openDatabase call and fix all the get functions 
+    xdescribe('Dashboard information', function () {
+
+        it('should be defined', function () {
+            expect(!!StorageService.getDashboardInfo).toBe(true);
+        });
+
+        it('should return a dashboard info object', function (done) {
+            StorageService.getDashboardInfo().then(function (dashboardInfo) {
+                expect(!!dashboardInfo).toBe(true);
+                done();
+            });
+            rootScope.$digest();
+        });
+
+        it('should provide patient stats in info', function (done) {
+            StorageService.getDashboardInfo().then(function (dashboardInfo) {
+                expect(!!dashboardInfo.patients).toBe(true);
+                done();
+            });
+            rootScope.$digest();
+        });
+    });
+
+    describe('Get villages', function () {
+        var fakeDb = {
+            find: function () {}
+        };
+        var fakeSucPromise = {
+            then: function (callback) {
+                callback(fakeDb);
+            }
+        };
+
+        it('should be defined', function () {
+            expect(!!StorageService.getVillages).toBe(true);
+        });
+
+        xit('should open the patient database', function () {
+
+            spyOn(StorageService, 'openDatabase').and.returnValue(fakeSucPromise);
+
+            StorageService.getVillages();
+
+            expect(StorageService.openDatabase).toHaveBeenCalledWith(PATIENT_DB);
+        });
+
+        xit('should fetch all villages', function () {
+            spyOn(fakeDb, 'find');
+
+            StorageService.getVillages();
+
+            expect(fakeDb.find).toHaveBeenCalledWith({}, {
+                village: 1
+            }, jasmine.any(Function));
+        });
+    });
+
+    describe('Get visit', function () {
+        var fakeDb = {
+            find: function () {}
+        };
+        var fakeSucPromise = {
+            then: function (callback) {
+                callback(fakeDb);
+            }
+        };
+
+        it('should be defined', function () {
+            expect(!!StorageService.getVisit).toBe(true);
+        });
+
+        xit('should open the visit database', function () {
+            spyOn(StorageService, 'openDatabase').and.returnValue(fakeSucPromise);
+            expect(StorageService.openDatabase).toHaveBeenCalledWith(VISIT_DB);
+        });
+    });
+
 });

@@ -46,7 +46,7 @@ describe('Controller: AddVisitCtrl', function () {
         it('should save valid visit objects', function () {
             spyOn(StorageService, 'saveVisit');
             var someValidVisitObj = {
-                regNum: '2222',
+                id: '2222',
                 date: new Date(),
                 issue: 'Headache'
             };
@@ -72,7 +72,7 @@ describe('Controller: AddVisitCtrl', function () {
 
         it('should not show validation errors for valid objects', function () {
             var someValidVisitObj = {
-                regNum: '2222',
+                id: '2222',
                 date: new Date(),
                 issue: 'Headache'
             };

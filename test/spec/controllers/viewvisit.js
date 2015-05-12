@@ -12,7 +12,7 @@ describe('Controller: ViewvisitCtrl', function () {
     var someExistingVisitId = '12345';
 
     var someVisit = {
-        regNum: someExistingPatientId,
+        id: someExistingPatientId,
         date: new Date(),
         issue: 'Headache'
     };

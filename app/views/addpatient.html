@@ -1,1 +1,93 @@
-<p>This is the addpatient view.</p>
+<form name="patientForm">
+    <h2>New Patient
+        <md-button class="md-fab md-primary md-mini" aria-label="Save" ng-click="savePatient(patient)">
+    <md-icon md-svg-src="images/ic_save_24px.svg"></md-icon>
+    </md-button>
+    </h2>
+    <md-card>
+        <md-card-content>
+            <div layout layout-sm="column">
+                <md-input-container flex>
+                    <label>Name</label>
+                    <input name="name" ng-model="patient.name" maxlength="50" minlength="3" md-maxlength="50" md-minlength="3" required>
+                    <ng-messages for="patientForm.name.$error" ng-messages-include="views/errormsgs.html">
+                    </ng-messages>
+                </md-input-container>
+                <md-input-container flex>
+                    <label>Reg. No/ID</label>
+                    <input name="id" ng-model="patient.id" maxlength="15" md-maxlength="15" required>
+                    <ng-messages for="patientForm.id.$error" ng-messages-include="views/errormsgs.html">
+                    </ng-messages>
+                </md-input-container>
+            </div>
+            <div layout layout-sm="column">
+                <md-autocomplete flex md-no-cache="true" md-selected-item="selectedVillage" md-search-text="villageStr" md-items="village in queryVillages(villageStr)" md-item-text="village.display" md-floating-label="Village">
+                    <span md-highlight-text="villageStr">{{village.display}}</span>
+                </md-autocomplete>
+                <md-input-container flex>
+                    <label>Phone number</label>
+                    <input name="contactNum" ng-model="patient.contactNum" maxlength="12" minlength="5" md-maxlength="12" md-minlength="5" required>
+                    <ng-messages for="patientForm.contactNum.$error" ng-messages-include="views/errormsgs.html">
+                    </ng-messages>
+                </md-input-container>
+            </div>
+            <div layout layout-sm="column">
+                <div flex layout="column" flex>
+                    <md-input-container>
+                        <label>Age</label>
+                        <input name="age" ng-model="patient.age" type="number" min="0" max="110" step="1" required>
+                        <ng-messages for="patientForm.age.$error" ng-messages-include="views/errormsgs.html">
+                        </ng-messages>
+                    </md-input-container>
+
+                    <pre>Gender = {{patient.gender}}</pre>
+                    <pre>Gender less than 3 = {{patient.gender < 3}}</pre>
+                    <md-radio-group name="gender" ng-model="patient.gender" required>
+                        <md-radio-button value="1" aria-label="Female" name="gender">Female</md-radio-button>
+                        <md-radio-button value="2" aria-label="Male" name="gender">Male</md-radio-button>
+                        <!--  TODO Deal with mimicking CSS style of other ng-messages-->
+                        <ng-messages for="patientForm.gender.$error" ng-messages-include="views/errormsgs.html">
+                        </ng-messages>
+                    </md-radio-group>
+                </div>
+                <div flex layout="column">
+                    <div layout="row">
+                        <md-radio-group ng-model="patient.bloodGroup">
+                            <md-radio-button value="1" aria-label="A+">A+</md-radio-button>
+
+                            <md-radio-button value="3" aria-label="B+">B+</md-radio-button>
+
+                            <md-radio-button value="5" aria-label="AB+">AB+</md-radio-button>
+
+                            <md-radio-button value="7" aria-label="O+">O+</md-radio-button>
+
+                        </md-radio-group>
+
+                        <md-radio-group ng-model="patient.bloodGroup">
+                            <md-radio-button value="2" aria-label="A-">A-</md-radio-button>
+                            <md-radio-button value="4" aria-label="B-">B-</md-radio-button>
+                            <md-radio-button value="6" aria-label="AB-">AB-</md-radio-button>
+                            <md-radio-button value="8" aria-label="O-">O-</md-radio-button>
+                        </md-radio-group>
+                    </div>
+                    <!--  TODO Deal with mimicking CSS style of other ng-messages-->
+                    <span class="warning-message" ng-show="!patient.bloodGroup">Blood group is required</span>
+                </div>
+            </div>
+            <md-input-container flex>
+                <label>Additional information</label>
+                <textarea ng-model="patient.additionalInfo" columns="1" md-maxlength="300"></textarea>
+            </md-input-container>
+        </md-card-content>
+    </md-card>
+
+    <div layout>
+        <md-button class="md-raised md-primary" ng-click="savePatient(patient)">
+            <label>Save</label>
+        </md-button>
+        <md-button class="md-raised md-warn" ng-click="clearPatient()" ng-show="!isEditing">
+            <label>Clear</label>
+        </md-button>
+        <p class="md-warn" ng-show="hasValErrors">Some inputs are invalid. Please fix them and try again</p>
+    </div>
+</form>

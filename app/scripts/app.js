@@ -1,4 +1,4 @@
-angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 'ngDialog'])
+angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 'ngDialog', 'ngMessages'])
     .config(function ($routeProvider) {
         'use strict';
         $routeProvider.when('/patient/new', {
@@ -25,4 +25,19 @@ angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 
         }).otherwise({
             redirectTo: '/dashboard'
         });
+    })
+    .run(function ($rootScope, $location, $mdToast) {
+        'use strict';
+        $rootScope.goTo = function (path) {
+            $location.path(path);
+        };
+
+        $rootScope.showSimpleToast = function (text, timeout) {
+            $mdToast.show(
+                $mdToast.simple()
+                .content(text || 'Missing toast text')
+                .position('bottom right')
+                .hideDelay(timeout || 3000)
+            );
+        };
     });

@@ -13,6 +13,7 @@ angular.module('PayirPatientManagement')
         var _cachedPatientDB;
         var _cachedVisitDB;
         var _cachedSettingsDB;
+        var _cachedListPromise;
 
         var PATIENT_DB = 'patient.db';
         var VISIT_DB = 'visit.db';
@@ -62,14 +63,25 @@ angular.module('PayirPatientManagement')
 
         //TODO Accept an argument to provide a subset of properties
         //TODO Handle empty fetch
-        function getPatients() {
+        function getPatients(subset) {
             var deferred = $q.defer();
+            var projection = (subset) ? {
+                name: 1,
+                village: 1,
+                id: 1,
+                gender: 1
+            } : {};
+
             openDatabase(PATIENT_DB).then(function (db) {
-                db.find({}, function (err, docs) {
+                db.find({}, projection, function (err, patients) {
                     if (err) {
                         deferred.reject(err);
+                    } else if (subset) {
+                        _cachedListPromise = deferred;
+                        console.log('Saved promise ', _cachedListPromise);
+                        deferred.notify(patients)
                     } else {
-                        deferred.resolve(docs);
+                        deferred.resolve(patients);
                     }
                 });
             }, function (err) {
@@ -86,7 +98,7 @@ angular.module('PayirPatientManagement')
             var deferred = $q.defer();
             openDatabase(PATIENT_DB).then(function (db) {
                 db.findOne({
-                    regNum: patientId
+                    id: patientId
                 }, function (err, patient) {
                     if (err) {
                         deferred.reject(err);
@@ -113,6 +125,10 @@ angular.module('PayirPatientManagement')
                             deferred.reject(err);
                         } else {
                             deferred.resolve(savedPatient);
+                            if (_cachedListPromise) {
+                                console.log('Notifying promise');
+                                _cachedListPromise.notify(savedPatient);
+                            }
                         }
                     });
                     console.log(db);
@@ -132,7 +148,7 @@ angular.module('PayirPatientManagement')
             var deferred = $q.defer();
             openDatabase(PATIENT_DB).then(function (db) {
                 db.remove({
-                    'regNum': patientId
+                    'id': patientId
                 }, {}, function (err, numRemoved) {
                     if (err) {
                         deferred.reject(err);
@@ -155,11 +171,12 @@ angular.module('PayirPatientManagement')
             console.log('Here');
             openDatabase(VISIT_DB).then(function (db) {
                 db.find({
-                    regNum: patientId
+                    id: patientId
                 }, function (err, visits) {
                     if (err) {
                         deferred.reject(err);
                     } else {
+                        visits = visits || [];
                         deferred.resolve(visits);
                     }
                 });
@@ -183,6 +200,7 @@ angular.module('PayirPatientManagement')
                     if (err) {
                         deferred.reject(err);
                     } else {
+                        visit = visit || {};
                         deferred.resolve(visit);
                     }
                 });
@@ -202,7 +220,22 @@ angular.module('PayirPatientManagement')
         }
 
         function getSettings() {
-
+            var deferred = $q.defer();
+            openDatabase(SETTINGS_DB).then(function (db) {
+                db.findOne({}, function (err, settings) {
+                    if (err) {
+                        deferred.reject(err);
+                    } else {
+                        settings = settings || {};
+                        settings.team = settings.team || [];
+                        //                        settings.lastSync = settings.lastSync || new Date(0);
+                        deferred.resolve(settings);
+                    }
+                });
+            }, function (err) {
+                deferred.reject(err);
+            });
+            return deferred.promise;
         }
 
         function saveSettings(settings) {
@@ -212,11 +245,13 @@ angular.module('PayirPatientManagement')
             var deferred = $q.defer();
             if (VldService.isValidSettings(settings)) {
                 openDatabase(SETTINGS_DB).then(function (db) {
-                    db.insert(settings, function (err, savedPatient) {
+                    db.update({}, settings, {
+                        upsert: true
+                    }, function (err) {
                         if (err) {
                             deferred.reject(err);
                         } else {
-                            deferred.resolve(savedPatient);
+                            deferred.resolve();
                         }
                     });
                 }, function (err) {
@@ -226,6 +261,76 @@ angular.module('PayirPatientManagement')
                 deferred.reject('Validation failed');
             }
 
+            return deferred.promise;
+        }
+
+        function getDashboardInfo() {
+            var deferred = $q.defer();
+            $q.all([openDatabase(PATIENT_DB), openDatabase(VISIT_DB), openDatabase(SETTINGS_DB)]).then(function (db) {
+                var patientDb = db[0];
+                var visitDb = db[1];
+                var settingsDb = db[2];
+
+                var dashboardInfo = {
+                    patients: {},
+                    visits: {},
+                    followUp: []
+                };
+
+                patientDb.count({}, function (err, count) {
+                    console.log('Total Patient count', count);
+                    dashboardInfo.patients.total = count;
+                });
+
+                visitDb.count({}, function (err, count) {
+                    console.log('Total visit count', count);
+                    dashboardInfo.visits.total = count;
+                });
+
+                var date = new Date();
+                var firstDay = new Date(date.getFullYear(), date.getMonth(), 1, 0, 0, 0, 0);
+
+                visitDb.count({
+                    'date': {
+                        $gt: firstDay
+                    }
+                }, function (err, count) {
+                    console.log('Total visit thisMonth count', count);
+                    dashboardInfo.visits.thisMonth = count;
+                });
+
+                console.log(settingsDb);
+
+                deferred.resolve(dashboardInfo);
+                //TODO Provide followUp array
+            }, function (err) {
+                deferred.reject(err);
+            });
+            return deferred.promise;
+        }
+
+        function getVillages() {
+            var deferred = $q.defer();
+            openDatabase(PATIENT_DB).then(function (db) {
+                db.find({}, {
+                    village: 1
+                }, function (err, patients) {
+                    if (err) {
+                        console.log('Error in getVillages');
+                        deferred.reject(err);
+                    } else {
+                        console.log('patients=', patients);
+                        var resArr = [];
+                        angular.forEach(patients, function (patient) {
+                            if (resArr.indexOf(patient.village) === -1) {
+                                resArr.push(patient.village);
+                            }
+                        });
+                        console.log('Returning ', resArr);
+                        deferred.resolve(resArr);
+                    }
+                });
+            });
             return deferred.promise;
         }
 
@@ -239,6 +344,8 @@ angular.module('PayirPatientManagement')
             'getVisit': getVisit,
             'saveVisit': saveVisit,
             'getSettings': getSettings,
-            'saveSettings': saveSettings
+            'saveSettings': saveSettings,
+            'getDashboardInfo': getDashboardInfo,
+            'getVillages': getVillages
         };
     });

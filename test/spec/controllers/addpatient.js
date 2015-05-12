@@ -8,13 +8,23 @@ describe('Controller: AddPatientCtrl', function () {
     var AddPatientCtrl,
         scope, VldService, StorageService, routeParams;
 
+    var fakeSettingsObj = {
+        villages: ['Thenur', 'Thottiyapatti', 'Edumalai']
+    };
+
     // Initialize the controller and a mock scope
     beforeEach(inject(function ($controller, $rootScope, _VldService_, _StorageService_) {
         scope = $rootScope.$new();
         VldService = _VldService_;
         StorageService = _StorageService_;
+        spyOn(StorageService, 'getSettings').and.returnValue({
+            then: function (callback) {
+                callback(fakeSettingsObj);
+            }
+        });
         AddPatientCtrl = $controller('AddPatientCtrl', {
             $scope: scope,
+            StorageService: StorageService
         });
     }));
 
@@ -32,22 +42,73 @@ describe('Controller: AddPatientCtrl', function () {
             expect(scope.isEditing).toBe(false);
         });
 
-        describe('Edit mode', function () {
+        it('should fetch the list of villages (settings)', function () {
+            expect(StorageService.getSettings).toHaveBeenCalled();
+        });
+
+        it('should store the list of villages as value and display', function () {
+            var updatedVillages = fakeSettingsObj.villages.map(function (village) {
+                return {
+                    value: village.toLowerCase(),
+                    display: village
+                };
+            });
+            expect(scope.villages).toEqual(updatedVillages);
+        });
+
+        describe('Edit mode - normal operation', function () {
 
             //Creating a new controller to run the isEditing check in the init section
-            beforeEach(inject(function ($controller, $rootScope) {
+            beforeEach(inject(function ($controller, $rootScope, _StorageService_) {
                 scope = $rootScope.$new();
                 routeParams = {
                     patientId: '12345'
                 };
+                StorageService = _StorageService_;
+                spyOn(StorageService, 'getPatient').and.returnValue({
+                    then: function (callback) {
+
+                        callback();
+                    }
+                });
                 AddPatientCtrl = $controller('AddPatientCtrl', {
                     $scope: scope,
-                    $routeParams: routeParams
+                    $routeParams: routeParams,
+                    StorageService: StorageService
                 });
             }));
 
             it('should switch to edit mode when patientId is available', function () {
                 expect(scope.isEditing).toBe(true);
+            });
+            it('should fetch the relevant patient information', function () {
+                expect(StorageService.getPatient).toHaveBeenCalled();
+            });
+        });
+
+        describe('Edit mode - error', function () {
+
+            //Creating a new controller to run the isEditing check in the init section
+            beforeEach(inject(function ($controller, $rootScope, _StorageService_) {
+                scope = $rootScope.$new();
+                routeParams = {
+                    patientId: '12345'
+                };
+                StorageService = _StorageService_;
+                spyOn(StorageService, 'getPatient').and.returnValue({
+                    then: function (callback, errback) {
+                        errback();
+                    }
+                });
+                AddPatientCtrl = $controller('AddPatientCtrl', {
+                    $scope: scope,
+                    $routeParams: routeParams,
+                    StorageService: StorageService
+                });
+            }));
+
+            it('should show an error message when fetch fails', function () {
+                expect(scope.hasError).toBe(true);
             });
         });
     });
@@ -69,11 +130,11 @@ describe('Controller: AddPatientCtrl', function () {
         it('should save valid patient objects', function () {
             spyOn(StorageService, 'savePatient');
             var someValidPatientObj = {
-                regNum: '12345',
+                id: '12345',
                 gender: 1,
                 name: 'Some Name',
                 age: 30,
-                contactNum1: '1234567890',
+                contactNum: '1234567890',
                 village: 'Thenur'
             };
 
@@ -98,11 +159,11 @@ describe('Controller: AddPatientCtrl', function () {
 
         it('should not show validation errors for valid objects', function () {
             var someValidPatientObj = {
-                regNum: '12345',
+                id: '12345',
                 gender: 1,
                 name: 'Some Name',
                 age: 30,
-                contactNum1: '1234567890',
+                contactNum: '1234567890',
                 village: 'Thenur'
             };
 

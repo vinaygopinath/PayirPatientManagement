@@ -16,13 +16,13 @@ describe('Service: VldService', function () {
             expect(!!VldService).toBe(true);
         });
 
-        it('should accept patient objects with a minimum of regNum, gender, name, age, contact number and village', function () {
+        it('should accept patient objects with a minimum of id, gender, name, age, contact number and village', function () {
             var someValidPatientObj = {
-                regNum: '12345',
+                id: '12345',
                 gender: 1,
                 name: 'Some Name',
                 age: 30,
-                contactNum1: '1234567890',
+                contactNum: '1234567890',
                 village: 'Thenur'
             };
             expect(VldService.isValidPatient(someValidPatientObj)).toBeTruthy();
@@ -31,13 +31,13 @@ describe('Service: VldService', function () {
         it('should reject empty or incomplete objects', function () {
             var emptyObj = {};
             var incompleteObj = {
-                regNum: '12333',
+                id: '12333',
                 age: 20
             };
 
             var anotherIncompleteObj = {
                 name: 'Name',
-                regNum: '2245',
+                id: '2245',
                 village: 'Thottiyapatti'
             };
 
@@ -49,11 +49,11 @@ describe('Service: VldService', function () {
 
         it('should reject genders that are not numerical (1 for female and 2 for male)', function () {
             var someInvalidGenderPatientObj = {
-                regNum: '12345',
+                id: '12345',
                 gender: 'Male',
                 name: 'Some Name',
                 age: 30,
-                contactNum1: '1234567890',
+                contactNum: '1234567890',
                 village: 'Thenur'
             };
             expect(VldService.isValidPatient(someInvalidGenderPatientObj)).toBeFalsy();
@@ -65,9 +65,9 @@ describe('Service: VldService', function () {
             expect(!!VldService.isValidVisit).toBe(true);
         });
 
-        it('should require a regNum, date and issue', function () {
+        it('should require a id, date and issue', function () {
             var someValidVisit = {
-                regNum: '2222',
+                id: '2222',
                 date: new Date(),
                 issue: 'Headache'
             };
@@ -84,6 +84,22 @@ describe('Service: VldService', function () {
     describe('Settings validation', function () {
         it('should be defined', function () {
             expect(!!VldService.isValidSettings).toBe(true);
+        });
+
+        it('should provide validation for person', function () {
+            expect(!!VldService.isValidPerson).toBe(true);
+        });
+
+        it('should accept persons with a minimum of 3 letters in their name, and optional email', function () {
+            var validPerson = {
+                name: 'Person'
+            };
+            var invalidPerson = {
+                name: 'AB'
+            };
+            expect(VldService.isValidPerson(validPerson)).toBeTruthy();
+            expect(VldService.isValidPerson(invalidPerson)).toBeFalsy();
+
         });
 
         it('should require team information and timestamp of last sync', function () {
