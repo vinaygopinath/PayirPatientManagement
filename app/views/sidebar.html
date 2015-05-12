@@ -1,45 +1,53 @@
-<div ng-controller="PatientListCtrl" class="animate">
-    <md-sidenav class="md-sidenav-left" md-is-locked-open="true">
-        <md-content>
-            <md-input-container flex ng-show="!hasError">
-                <label>Search</label>
-                <input ng-model="searchStr" ng-model-options="{ debounce: 400}">
-                <md-icon md-svg-src="images/ic_clear_24px.svg" class="clear-icon" ng-click="clearSearch()"></md-icon>
-            </md-input-container>
-            <!--
+<md-sidenav class="md-sidenav-left scroll-sidenav" md-is-locked-open="true" flex>
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Home" ng-href="#/dashboard">
+                <md-icon md-svg-icon="images/icon-128.svg"></md-icon>
+            </md-button>
+            <h2>
+                    <span>Payir Patient Management</span>
+                </h2>
+        </div>
+    </md-toolbar>
+    <md-content ng-controller="PatientListCtrl">
+        <md-input-container flex ng-show="!hasError">
+            <label>Search</label>
+            <input ng-model="searchStr" ng-model-options="{ debounce: 400}">
+            <md-icon md-svg-src="images/ic_clear_24px.svg" class="clear-icon" ng-click="clearSearch()"></md-icon>
+        </md-input-container>
+        <!--
             <pre>Patients = {{patients}}</pre>
 <pre>hasError = {{hasError}}</pre>
 -->
-            <md-card ng-show="patients && patients.length > 0">
-                <md-card-content>
-                    <md-list>
-                        <!-- TODO Permanent highlight for clicked patient -->
-                        <md-list-item class="md-2-line" ng-repeat="patient in filteredPatients = (patients | filter:search)" ng-click="goTo('patient/'+patient.id)">
-                            <img class="md-avatar" ng-src="{{patient.gender == 1 ? 'images/ic_female.svg' : 'images/ic_male.svg'}}" alt="{{patient.name}}" />
-                            <div class="md-list-item-text">
-                                <h3>{{ patient.name }}</h3>
-                                <p>{{ patient.village }}</p>
-                            </div>
-                        </md-list-item>
-                        <div ng-show="filteredPatients.length === 0" layout="column">
-                            <p>No match found for {{searchStr}}</p>
-                            <p>Searched {{patients.length}} patients in total</p>
-                            <md-button md-no-ink class="md-primary" ng-click="clearSearch()" layout-align="end center">Clear search</md-button>
+        <md-card ng-show="patients && patients.length > 0">
+            <md-card-content>
+                <md-list>
+                    <!-- TODO Permanent highlight for clicked patient -->
+                    <md-list-item class="md-2-line" ng-repeat="patient in filteredPatients = (patients | filter:search)" ng-click="goTo('patient/'+patient.id)">
+                        <img class="md-avatar" ng-src="{{patient.gender == 1 ? 'images/ic_female.svg' : 'images/ic_male.svg'}}" alt="{{patient.name}}" />
+                        <div class="md-list-item-text">
+                            <h3>{{ patient.name }}</h3>
+                            <p>{{ patient.village }}</p>
                         </div>
-                </md-card-content>
-            </md-card>
-            <md-card ng-show="hasError">
-                <md-card-content>
-                    <p class="md-warn">Problem loading patients list. Please refresh this app</p>
-                </md-card-content>
-            </md-card>
-            <md-card ng-show="patients.length === 0 && !hasError">
-                <md-card-content layout="column">
-                    <p>No patients yet!</p>
-                    <md-button md-no-ink class="md-primary" ng-href="#/patient/new" layout-align="end center">Add patient</md-button>
-                </md-card-content>
-            </md-card>
+                    </md-list-item>
+                    <div ng-show="filteredPatients.length === 0" layout="column">
+                        <p>No match found for {{searchStr}}</p>
+                        <p>Searched {{patients.length}} patients in total</p>
+                        <md-button md-no-ink class="md-primary" ng-click="clearSearch()" layout-align="end center">Clear search</md-button>
+                    </div>
+            </md-card-content>
+        </md-card>
+        <md-card ng-show="hasError">
+            <md-card-content>
+                <p class="md-warn">Problem loading patients list. Please refresh this app</p>
+            </md-card-content>
+        </md-card>
+        <md-card ng-show="patients.length === 0 && !hasError">
+            <md-card-content layout="column">
+                <p>No patients yet!</p>
+                <md-button md-no-ink class="md-primary" ng-href="#/patient/new" layout-align="end center">Add patient</md-button>
+            </md-card-content>
+        </md-card>
 
-        </md-content>
-    </md-sidenav>
-</div>
+    </md-content>
+</md-sidenav>

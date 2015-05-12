@@ -26,3 +26,10 @@ md-radio-group.ng-message {
     font-size: 0.75em;
     color: #FF982D;
 }
+/* Show vertical scrollbar on sidebar if necessary */
+
+.scroll-sidenav {
+    position: fixed !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+}

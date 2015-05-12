@@ -1,0 +1,30 @@
+<h2>Patient Details</h2>
+<md-card>
+    <md-card-content>
+        <h3>
+    {{patient.name}}
+    <md-button class="md-fab md-primary md-mini" aria-label="Edit" ng-click="goTo('patient/'+patient.id+'/edit')" >
+    <md-icon md-svg-src="images/ic_mode_edit_24px.svg"></md-icon>
+    </md-button>
+    <md-button class="md-fab md-warn md-mini" aria-label="Delete" ng-click="deletePatient($event)" >
+    <md-icon md-svg-src="images/ic_delete_24px.svg"></md-icon>
+    </md-button>
+        </h3>
+        <div layout layout-sm="column">
+            <p flex>Reg.no/ID: {{patient.id}}</p>
+            <p flex>Village: {{patient.village}}</p>
+        </div>
+        <div layout layout-sm="column">
+            <p flex>Age: {{patient.age}}</p>
+            <p flex>Phone number: {{patient.contactNum}}</p>
+        </div>
+        <div layout layout-sm="column">
+            <p flex>Gender: {{patient.gender == 1 ? 'Female': 'Male'}}</p>
+            <p flex>Blood group: {{patient.bloodGroup | bloodGroupFilter}}</p>
+        </div>
+        <div layout="column" ng-if="patient.additionalInfo">
+            <p>Additional information</p>
+            <p>{{patient.additionalInfo}}</p>
+        </div>
+    </md-card-content>
+</md-card>

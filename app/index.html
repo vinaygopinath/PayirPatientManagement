@@ -7,8 +7,6 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
-    <link rel="stylesheet" href="bower_components/ngDialog/css/ngDialog.min.css" />
-    <link rel="stylesheet" href="bower_components/ngDialog/css/ngDialog-theme-default.min.css" />
     <link rel="stylesheet" href="css/main.css" />
 
 </head>
@@ -17,12 +15,6 @@
 
     <md-toolbar>
         <div class="md-toolbar-tools">
-            <md-button class="md-icon-button" aria-label="Home" ng-href="#/dashboard">
-                <md-icon md-svg-icon="images/icon-128.svg"></md-icon>
-            </md-button>
-            <h2>
-                    <span>Payir Patient Management</span>
-                </h2>
             <span flex></span>
             <md-button class="md-icon-button" aria-label="Add patient" ng-href="#/patient/new">
                 <md-icon md-svg-icon="images/ic_add_circle_24px.svg"></md-icon>
@@ -33,7 +25,7 @@
         </div>
     </md-toolbar>
     <section layout="row">
-        <div flex="33" ng-include="'views/sidebar.html'"></div>
+        <div flex="33" ng-include="'views/sidebar.html'" layout="vertical"></div>
         <div flex="66" ng-view layout-padding></div>
     </section>
 
@@ -43,7 +35,6 @@
     <script src="bower_components/angular-aria/angular-aria.js"></script>
     <script src="bower_components/angular-material/angular-material.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
-    <script src="bower_components/ngDialog/js/ngDialog.js"></script>
     <script src="bower_components/angular-messages/angular-messages.js"></script>
 
     <script src="scripts/app.js"></script>
@@ -56,6 +47,7 @@
     <script src="scripts/controllers/viewvisit.js"></script>
     <script src="scripts/controllers/viewpatient.js"></script>
     <script src="scripts/controllers/addpatient.js"></script>
+    <script src="scripts/filters/bloodgroup.js"></script>
 
 </html>
 </body>

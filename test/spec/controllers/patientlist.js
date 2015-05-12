@@ -28,8 +28,8 @@ describe('Controller: PatientListCtrl', function () {
     var StorageService = {
         getPatients: function () {
             return {
-                then: function (callback) {
-                    callback(someValidPatientObjs);
+                then: function (callback, errback, notiback) {
+                    notiback(someValidPatientObjs);
                 }
             };
         }

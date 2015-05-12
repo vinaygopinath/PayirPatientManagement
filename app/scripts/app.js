@@ -1,4 +1,4 @@
-angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 'ngDialog', 'ngMessages'])
+angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 'ngMessages'])
     .config(function ($routeProvider) {
         'use strict';
         $routeProvider.when('/patient/new', {
@@ -26,7 +26,7 @@ angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 
             redirectTo: '/dashboard'
         });
     })
-    .run(function ($rootScope, $location, $mdToast) {
+    .run(function ($rootScope, $location, $mdToast, $mdDialog) {
         'use strict';
         $rootScope.goTo = function (path) {
             $location.path(path);
@@ -39,5 +39,20 @@ angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 
                 .position('bottom right')
                 .hideDelay(timeout || 3000)
             );
+        };
+
+        $rootScope.showConfirm = function (ev, options) {
+            var confirm = $mdDialog.confirm()
+                .title(options.title || 'Missing Title!')
+                .content(options.content || 'Missing content!')
+                .ariaLabel(options.title || 'Unknown aria')
+                .ok(options.ok || 'Missing OK Text')
+                .targetEvent(ev);
+
+            if (options.cancel) {
+                confirm.cancel(options.cancel);
+            }
+
+            return $mdDialog.show(confirm);
         };
     });

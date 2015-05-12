@@ -119,7 +119,7 @@ describe('Service: StorageService', function () {
             var somePatientId = '1234';
             var openDatabase = jasmine.createSpy('openDatabase');
             console.log(openDatabase);
-            //spyOn(StorageService, 'openDatabase').and.returnValue(fakeSucPromise);
+            spyOn(StorageService, 'openDatabase').and.returnValue(fakeSucPromise);
             StorageService.getPatient(somePatientId);
             expect(openDatabase).toHaveBeenCalledWith(PATIENT_DB);
         });

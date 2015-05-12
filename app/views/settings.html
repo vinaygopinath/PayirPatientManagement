@@ -11,7 +11,7 @@
 <md-card ng-show="!hasError">
     <md-card-content>
         <div layout="column">
-            <h4>Team</h4>
+            <h3>Team</h3>
             <form name="teamForm">
                 <div ng-repeat="person in settings.team track by $index" layout="row">
                     <md-input-container flex="45">
@@ -50,7 +50,7 @@
 </md-card>
 <md-card ng-show="!hasError">
     <md-card-content>
-        <h4>Google Drive Backup (Sync)</h4>
+        <h3>Google Drive Backup (Sync)</h3>
         <p>Last synced: {{ settings.lastSync ? (settings.lastSync | date: 'dd MMM yy, hh:mm a') : 'Never' }}</p>
         <p>
             <md-button class="md-raised">

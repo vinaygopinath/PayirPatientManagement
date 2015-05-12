@@ -8,18 +8,16 @@ describe('Controller: AddPatientCtrl', function () {
     var AddPatientCtrl,
         scope, VldService, StorageService, routeParams;
 
-    var fakeSettingsObj = {
-        villages: ['Thenur', 'Thottiyapatti', 'Edumalai']
-    };
+    var fakeVillages = ['Thenur', 'Thottiyapatti', 'Edumalai'];
 
     // Initialize the controller and a mock scope
     beforeEach(inject(function ($controller, $rootScope, _VldService_, _StorageService_) {
         scope = $rootScope.$new();
         VldService = _VldService_;
         StorageService = _StorageService_;
-        spyOn(StorageService, 'getSettings').and.returnValue({
+        spyOn(StorageService, 'getVillages').and.returnValue({
             then: function (callback) {
-                callback(fakeSettingsObj);
+                callback(fakeVillages);
             }
         });
         AddPatientCtrl = $controller('AddPatientCtrl', {
@@ -42,12 +40,12 @@ describe('Controller: AddPatientCtrl', function () {
             expect(scope.isEditing).toBe(false);
         });
 
-        it('should fetch the list of villages (settings)', function () {
-            expect(StorageService.getSettings).toHaveBeenCalled();
+        it('should fetch the list of villages', function () {
+            expect(StorageService.getVillages).toHaveBeenCalled();
         });
 
         it('should store the list of villages as value and display', function () {
-            var updatedVillages = fakeSettingsObj.villages.map(function (village) {
+            var updatedVillages = fakeVillages.map(function (village) {
                 return {
                     value: village.toLowerCase(),
                     display: village
@@ -57,7 +55,10 @@ describe('Controller: AddPatientCtrl', function () {
         });
 
         describe('Edit mode - normal operation', function () {
-
+            var fakePatientObj = {
+                village: 'SomeVillage',
+                id: '12345'
+            };
             //Creating a new controller to run the isEditing check in the init section
             beforeEach(inject(function ($controller, $rootScope, _StorageService_) {
                 scope = $rootScope.$new();
@@ -68,7 +69,7 @@ describe('Controller: AddPatientCtrl', function () {
                 spyOn(StorageService, 'getPatient').and.returnValue({
                     then: function (callback) {
 
-                        callback();
+                        callback(fakePatientObj);
                     }
                 });
                 AddPatientCtrl = $controller('AddPatientCtrl', {
@@ -100,6 +101,7 @@ describe('Controller: AddPatientCtrl', function () {
                         errback();
                     }
                 });
+
                 AddPatientCtrl = $controller('AddPatientCtrl', {
                     $scope: scope,
                     $routeParams: routeParams,
@@ -128,7 +130,11 @@ describe('Controller: AddPatientCtrl', function () {
         });
 
         it('should save valid patient objects', function () {
-            spyOn(StorageService, 'savePatient');
+            spyOn(StorageService, 'savePatient').and.returnValue({
+                then: function (callback) {
+                    callback();
+                }
+            });
             var someValidPatientObj = {
                 id: '12345',
                 gender: 1,

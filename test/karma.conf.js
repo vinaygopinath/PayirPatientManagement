@@ -13,7 +13,6 @@ module.exports = function (karma) {
         '../app/bower_components/angular-route/angular-route.js',
         '../app/bower_components/angular-material/angular-material.js',
         '../app/bower_components/angular-mocks/angular-mocks.js',
-        '../app/bower_components/ngDialog/js/ngDialog.js',
         '../app/bower_components/angular-messages/angular-messages.js',
         '../app/scripts/{,*/}*.js',
         'spec/{,*/}*.js'

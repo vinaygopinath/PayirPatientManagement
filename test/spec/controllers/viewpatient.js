@@ -91,16 +91,13 @@ describe('Controller: ViewPatientCtrl', function () {
     }));
 
     describe('Delete', function () {
-        var ngDialog;
 
-        beforeEach(inject(function ($controller, $rootScope, _ngDialog_) {
+        beforeEach(inject(function ($controller, $rootScope) {
             scope = $rootScope.$new();
-            ngDialog = _ngDialog_;
             ViewPatientCtrl = $controller('ViewPatientCtrl', {
                 $scope: scope,
                 StorageService: StorageService,
                 $routeParams: routeParams,
-                ngDialog: _ngDialog_
             });
         }));
 
@@ -110,18 +107,18 @@ describe('Controller: ViewPatientCtrl', function () {
 
         it('should show a confirmation dialog', function () {
             spyOn(StorageService, 'deletePatient').and.callThrough();
-            spyOn(ngDialog, 'openConfirm').and.returnValue({
+            spyOn(scope, 'showConfirm').and.returnValue({
                 then: function (callback) {
                     callback();
                 }
             });
             scope.deletePatient();
-            expect(ngDialog.openConfirm).toHaveBeenCalled();
+            expect(scope.showConfirm).toHaveBeenCalled();
         });
 
         it('should delete the patient record when delete is confirmed', function () {
             spyOn(StorageService, 'deletePatient').and.callThrough();
-            spyOn(ngDialog, 'openConfirm').and.returnValue({
+            spyOn(scope, 'showConfirm').and.returnValue({
                 then: function (callback) {
                     callback();
                 }
@@ -132,9 +129,11 @@ describe('Controller: ViewPatientCtrl', function () {
 
         it('should do nothing when delete is cancelled', function () {
             spyOn(StorageService, 'deletePatient').and.callThrough();
-            spyOn(ngDialog, 'openConfirm').and.returnValue({
+            spyOn(scope, 'showConfirm').and.returnValue({
                 then: function (callback, errback) {
-                    errback();
+                    if (errback) {
+                        errback();
+                    }
                 }
             });
             scope.deletePatient();

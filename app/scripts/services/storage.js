@@ -79,7 +79,7 @@ angular.module('PayirPatientManagement')
                     } else if (subset) {
                         _cachedListPromise = deferred;
                         console.log('Saved promise ', _cachedListPromise);
-                        deferred.notify(patients)
+                        deferred.notify(patients);
                     } else {
                         deferred.resolve(patients);
                     }

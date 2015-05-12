@@ -32,6 +32,8 @@ angular.module('PayirPatientManagement')
 
             StorageService.getPatient($routeParams.patientId).then(function (patient) {
                 $scope.patient = patient;
+                $scope.villageStr = patient.village;
+                //TODO Deal with selectedVillage;
             }, function () {
                 $scope.hasError = true;
             });
@@ -57,7 +59,7 @@ angular.module('PayirPatientManagement')
         $scope.clearPatient = function () {
             $scope.patient = {};
             $scope.hasValErrors = false;
-            $scope.villageStr = "";
+            $scope.villageStr = '';
             $scope.selectedVillage = {};
         };
 
