@@ -15,14 +15,12 @@ angular.module('PayirPatientManagement')
         $scope.isEditing = false;
 
         StorageService.getVillages().then(function (villages) {
-            console.log('AddPatient: getVillages: Received villages', villages);
             $scope.villages = villages.map(function (village) {
                 return {
                     value: village.toLowerCase(),
                     display: village
                 };
             });
-            console.log('villages is now ', $scope.villages);
         }, function () {
             $scope.hasError = true;
         });

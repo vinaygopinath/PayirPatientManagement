@@ -15,6 +15,7 @@ describe('Controller: AddVisitCtrl', function () {
         StorageService = _StorageService_;
         AddVisitCtrl = $controller('AddVisitCtrl', {
             $scope: scope,
+            StorageService: _StorageService_
         });
     }));
 

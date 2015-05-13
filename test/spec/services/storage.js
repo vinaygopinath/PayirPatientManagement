@@ -6,18 +6,58 @@ describe('Service: StorageService', function () {
     var PATIENT_DB = 'patient.db';
     var VISIT_DB = 'visit.db';
     var SETTINGS_DB = 'settings.db';
+    var TEST_DB = 'test.db';
 
     // load the service's module
     beforeEach(angular.mock.module('PayirPatientManagement'));
-
+    //    var deferred = function () {
+    //        return {
+    //            promise: {
+    //                then: function (callback) {
+    //                    callback();
+    //                }
+    //            },
+    //            reject: function () {},
+    //            resolve: function () {}
+    //        };
+    //    };
+    //    var q = {
+    //        defer: deferred
+    //    };
+    //
+    //    beforeEach(function () {
+    //
+    //        angular.mock.module(function ($provide) {
+    //            $provide.value('$q', q);
+    //        });
+    //
+    //    });
 
     // instantiate service
-    var StorageService, VldService, rootScope, q;
-    beforeEach(inject(function ($rootScope, $injector, $q) {
-        q = $q;
+    var StorageService, VldService, rootScope, Datastore, q, spiedOpenDatabase;
+    beforeEach(inject(function ($rootScope, _VldService_, _StorageService_, $q) {
         rootScope = $rootScope;
-        StorageService = $injector.get('StorageService');
-        VldService = $injector.get('VldService');
+        StorageService = _StorageService_;
+        Datastore = require('nedb');
+        q = $q;
+        spyOn(q, 'defer').and.callThrough();
+        spiedOpenDatabase = spyOn(StorageService, 'openDatabase');
+        spiedOpenDatabase.and.callThrough();
+        spyOn(window, 'require').and.callFake(function (mod) {
+            if (mod === 'nedb') {
+                return Datastore;
+            } else if (mod === 'path') {
+                return {
+                    join: function () {
+                        return TEST_DB;
+                    }
+                };
+            } else {
+                throw new Error('Unsupported test module!');
+            }
+        });
+        StorageService = _StorageService_;
+        VldService = _VldService_;
     }));
 
     describe('openDatabase', function () {
@@ -25,39 +65,20 @@ describe('Service: StorageService', function () {
             expect(!!StorageService.openDatabase).toBe(true);
         });
 
-        //        it('should return a database', function (done) {
-        //            var result;
-        //            StorageService.openDatabase().then(function (db) {
-        //                result = db;
-        //                done();
-        //            }, function (err) {
-        //                result = err;
-        //                done();
-        //            });
-        //            rootScope.$digest();
-        //            expect(result).toBe(true);
-        //        });
+        it('should create a promise', function () {
+            StorageService.openDatabase();
+            expect(q.defer).toHaveBeenCalled();
+        });
 
+        it('should require the nedb module', function () {
+            StorageService.openDatabase();
+            expect(window.require).toHaveBeenCalledWith('nedb');
+        });
 
-
-        //        it('should return the datastore', function () {
-        //            var deferred = q.defer();
-        //            var mockDbObj = {
-        //                name: 'mockDB'
-        //            };
-        //            deferred.resolve(mockDbObj);
-        //            spyOn(StorageService, 'openDatabase').and.returnValue(deferred.promise);
-        //
-        //            var result;
-        //            StorageService.openDatabase().then(function (db) {
-        //                result = db;
-        //                console.log("Received DB = ", db);
-        //            }, function (err) {
-        //                console.log("Err = ", err);
-        //            });
-        //            rootScope.$apply();
-        //            expect(result).toBeTruthy();
-        //        });
+        it('should require the path module', function () {
+            StorageService.openDatabase();
+            expect(window.require).toHaveBeenCalledWith('path');
+        });
     });
 
     describe('getPatients', function () {
@@ -108,20 +129,28 @@ describe('Service: StorageService', function () {
         });
 
         xit('should open the patient database', function () {
-            var fakeDb = {
-                findOne: function () {}
-            };
-            var fakeSucPromise = {
-                then: function (callback) {
-                    callback(fakeDb);
-                }
-            };
-            var somePatientId = '1234';
-            var openDatabase = jasmine.createSpy('openDatabase');
-            console.log(openDatabase);
-            spyOn(StorageService, 'openDatabase').and.returnValue(fakeSucPromise);
-            StorageService.getPatient(somePatientId);
-            expect(openDatabase).toHaveBeenCalledWith(PATIENT_DB);
+            spiedOpenDatabase.and.callFake(function () {
+                return new Datastore({
+                    filename: TEST_DB
+                });
+            });
+            StorageService.getPatient('1234');
+            expect(spiedOpenDatabase).toHaveBeenCalled();
+
+            //            var fakeDb = {
+            //                findOne: function () {}
+            //            };
+            //            var fakeSucPromise = {
+            //                then: function (callback) {
+            //                    callback(fakeDb);
+            //                }
+            //            };
+            //            var somePatientId = '1234';
+            //            var openDatabase = jasmine.createSpy('openDatabase');
+            //            console.log(openDatabase);
+            //            spyOn(StorageService, 'openDatabase').and.returnValue(fakeSucPromise);
+            //            StorageService.getPatient(somePatientId);
+            //            expect(openDatabase).toHaveBeenCalledWith(PATIENT_DB);
         });
     });
 
@@ -296,6 +325,19 @@ describe('Service: StorageService', function () {
         xit('should open the visit database', function () {
             spyOn(StorageService, 'openDatabase').and.returnValue(fakeSucPromise);
             expect(StorageService.openDatabase).toHaveBeenCalledWith(VISIT_DB);
+        });
+    });
+
+    describe('Delete visit', function () {
+
+        it('should be defined', function () {
+            expect(!!StorageService.deleteVisit).toBe(true);
+        });
+
+        it('should throw an error when called without a visit ID', function () {
+            expect(function () {
+                StorageService.deleteVisit();
+            }).toThrow();
         });
     });
 

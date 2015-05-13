@@ -28,6 +28,7 @@
         "expect": true,
         "inject": true,
         "xdescribe": true,
-        "xit": true
+        "xit": true,
+        "window": true
     }
 }

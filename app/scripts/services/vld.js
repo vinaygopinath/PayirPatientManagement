@@ -18,6 +18,17 @@ angular.module('PayirPatientManagement')
                 var valAge = patient.age && patient.age >= 0 && patient.age <= 110;
                 var valContactNum = patient.contactNum && patient.contactNum.trim().length >= 5;
                 var valVillage = patient.village && patient.village.trim().length >= 3;
+
+                var valDate, valReason;
+                if (patient.followup) {
+                    var propertiesRequired = true;
+                    if (!patient.followup.date && !patient.followup.reason && !patient.followup.team) {
+                        propertiesRequired = false;
+                    }
+                    valDate = (patient.followup.date) ? (patient.followup.date > new Date()) : propertiesRequired;
+                    valReason = (patient.followup.reason) ? (patient.followup.reason.trim().length >= 5) : propertiesRequired;
+                    valTeam = (patient.followup.team) ? (patient.followup.team.length >= 1) : true;
+                }
                 //                console.log('ID', valId);
                 //                console.log('gender', valGender);
                 //                console.log('name', valName);

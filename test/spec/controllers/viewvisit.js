@@ -1,15 +1,13 @@
 'use strict';
 
-describe('Controller: ViewvisitCtrl', function () {
+describe('Controller: ViewVisitCtrl', function () {
 
     // load the controller's module
     beforeEach(angular.mock.module('PayirPatientManagement'));
 
-    var ViewVisitCtrl,
-        scope;
+    var ViewVisitCtrl, scope, mdDialog;
 
     var someExistingPatientId = '12345';
-    var someExistingVisitId = '12345';
 
     var someVisit = {
         id: someExistingPatientId,
@@ -17,92 +15,50 @@ describe('Controller: ViewvisitCtrl', function () {
         issue: 'Headache'
     };
 
-    var routeParams = {
-        visitId: someExistingVisitId
-    };
-
-    var StorageService = {
-        getVisit: function (id) {
-            if (id === someExistingVisitId) {
-                return {
-                    then: function (callback) {
-                        callback(someVisit);
-                    }
-                };
-            } else {
-                return {
-                    then: function (callback, errback) {
-                        errback('Invalid ID');
-                    }
-                };
-            }
-        }
-    };
-
     beforeEach(angular.mock.module(function ($provide) {
-        $provide.value('StorageService', StorageService);
+        $provide.value('visit', someVisit);
     }));
 
     // Initialize the controller and a mock scope
-    beforeEach(inject(function ($controller, $rootScope, _StorageService_) {
+    beforeEach(inject(function ($controller, $rootScope, _StorageService_, _$mdDialog_) {
         scope = $rootScope.$new();
+        mdDialog = _$mdDialog_;
         ViewVisitCtrl = $controller('ViewVisitCtrl', {
             $scope: scope,
-            StorageService: _StorageService_
+            $mdDialog: _$mdDialog_
         });
     }));
 
     describe('Initialization', function () {
 
-        it('should initially have an empty visit object', function () {
-            expect(scope.visit).toEqual({});
+        it('should store the supplied visit object', function () {
+            expect(scope.visit).toEqual(someVisit);
+        });
+    });
+
+    describe('Close', function () {
+
+        it('should be defined', function () {
+            expect(!!scope.close).toBe(true);
         });
 
-        it('should show an error message when visitId is missing', function () {
-            expect(scope.isMissingId).toBe(true);
+        it('should close the dialog', function () {
+            spyOn(mdDialog, 'cancel');
+            scope.close();
+            expect(mdDialog.cancel).toHaveBeenCalled();
+        });
+    });
+
+    describe('Delete', function () {
+
+        it('should be defined', function () {
+            expect(!!scope.delete).toBe(true);
         });
 
-        describe('Fetch information for valid patientId', function () {
-
-            beforeEach(inject(function ($rootScope, $controller) {
-                scope = $rootScope.$new();
-                spyOn(StorageService, 'getVisit').and.callThrough();
-                ViewVisitCtrl = $controller('ViewVisitCtrl', {
-                    $scope: scope,
-                    $routeParams: routeParams,
-                    StorageService: StorageService
-                });
-            }));
-
-            it('should call getVisit for the given visit', function () {
-                expect(StorageService.getVisit).toHaveBeenCalledWith(routeParams.visitId);
-            });
-
-            it('should store the fetched visit information', function () {
-                expect(scope.visit).toEqual(someVisit);
-            });
-        });
-
-        describe('Error messages for invalid visitId', function () {
-
-            var someNonExistingVisitId = '98765';
-
-            var routeParams2 = {
-                visitId: someNonExistingVisitId
-            };
-
-            beforeEach(inject(function ($controller, $rootScope) {
-                scope = $rootScope.$new();
-                ViewVisitCtrl = $controller('ViewVisitCtrl', {
-                    $scope: scope,
-                    $routeParams: routeParams2,
-                    StorageService: StorageService
-                });
-            }));
-
-            it('should show an error for visit information', function () {
-                expect(scope.hasError).toBe(true);
-            });
+        it('should dismiss the dialog with the visit ID', function () {
+            spyOn(mdDialog, 'hide');
+            scope.delete();
+            expect(mdDialog.hide).toHaveBeenCalledWith(scope.visit.id);
         });
     });
 

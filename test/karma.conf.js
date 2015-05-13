@@ -15,7 +15,7 @@ module.exports = function (karma) {
         '../app/bower_components/angular-mocks/angular-mocks.js',
         '../app/bower_components/angular-messages/angular-messages.js',
         '../app/scripts/{,*/}*.js',
-        'spec/{,*/}*.js'
+        'spec/{,*/}*.js',
 //            'spec/services/storage.js'
         ],
 
@@ -24,6 +24,7 @@ module.exports = function (karma) {
 
         browserNoActivityTimeout: 60000,
 
+        reportSlowerThan: 2000,
 
         reporters: ['mocha'],
 

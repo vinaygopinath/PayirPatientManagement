@@ -95,11 +95,15 @@ angular.module('PayirPatientManagement')
             if (!patientId) {
                 throw new Error('getPatient needs the patientId parameter');
             }
+            console.log('Step 1');
             var deferred = $q.defer();
+            console.log('Step 1A');
             openDatabase(PATIENT_DB).then(function (db) {
+                console.log('Step 2?');
                 db.findOne({
                     id: patientId
                 }, function (err, patient) {
+                    console.log('Step 3?');
                     if (err) {
                         deferred.reject(err);
                     } else {
@@ -334,6 +338,27 @@ angular.module('PayirPatientManagement')
             return deferred.promise;
         }
 
+        function deleteVisit(visitId) {
+            if (!visitId) {
+                throw new Error('deleteVisit needs an ID parameter');
+            }
+            var deferred = $q.defer();
+            openDatabase(VISIT_DB).then(function (db) {
+                db.remove({
+                    'id': visitId
+                }, {}, function (err, numRemoved) {
+                    if (err) {
+                        deferred.reject(err);
+                    } else {
+                        deferred.resolve(numRemoved);
+                    }
+                });
+            }, function (err) {
+                deferred.reject(err);
+            });
+            return deferred;
+        }
+
         return {
             'openDatabase': openDatabase,
             'getPatients': getPatients,
@@ -346,6 +371,7 @@ angular.module('PayirPatientManagement')
             'getSettings': getSettings,
             'saveSettings': saveSettings,
             'getDashboardInfo': getDashboardInfo,
-            'getVillages': getVillages
+            'getVillages': getVillages,
+            'deleteVisit': deleteVisit
         };
     });

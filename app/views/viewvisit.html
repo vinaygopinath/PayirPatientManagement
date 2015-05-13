@@ -1,1 +1,21 @@
-<p>This is the viewvisit view.</p>
+<md-dialog>
+    <md-dialog-content>
+        <h3>Visit Details</h3>
+        <div layout layout-sm="column">
+            <p flex>Date: {{::visit.date | date: 'dd MMM yy'}}</p>
+            <p flex>Attended by: {{::visit.attendedBy || 'Unknown'}}</p>
+        </div>
+        <div layout="column">
+            <span flex>Issue</span>
+            <span flex>{{::visit.issue}}</span>
+        </div>
+        <div class="md-actions" layout="row">
+            <md-button ng-click="delete(visit.id)" class="md-warn md-raised">
+                Delete
+            </md-button>
+            <md-button ng-click="close()" class="md-primary md-raised">
+                Close
+            </md-button>
+        </div>
+    </md-dialog-content>
+</md-dialog>

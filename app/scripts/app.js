@@ -41,13 +41,12 @@ angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 
             );
         };
 
-        $rootScope.showConfirm = function (ev, options) {
+        $rootScope.showConfirm = function (options) {
             var confirm = $mdDialog.confirm()
                 .title(options.title || 'Missing Title!')
                 .content(options.content || 'Missing content!')
                 .ariaLabel(options.title || 'Unknown aria')
-                .ok(options.ok || 'Missing OK Text')
-                .targetEvent(ev);
+                .ok(options.ok || 'Missing OK Text');
 
             if (options.cancel) {
                 confirm.cancel(options.cancel);

@@ -3,13 +3,19 @@
     <md-card-content>
         <h3>
     {{patient.name}}
-    <md-button class="md-fab md-primary md-mini" aria-label="Edit" ng-click="goTo('patient/'+patient.id+'/edit')" >
-    <md-icon md-svg-src="images/ic_mode_edit_24px.svg"></md-icon>
-    </md-button>
-    <md-button class="md-fab md-warn md-mini" aria-label="Delete" ng-click="deletePatient($event)" >
-    <md-icon md-svg-src="images/ic_delete_24px.svg"></md-icon>
-    </md-button>
-        </h3>
+        <md-button class="md-fab md-primary md-mini" aria-label="Edit" ng-click="goTo('patient/'+patient.id+'/edit')">
+            <md-icon md-svg-src="images/ic_mode_edit_24px.svg"></md-icon>
+            <md-tooltip>
+          Edit Patient Information
+        </md-tooltip>
+        </md-button>
+        <md-button class="md-fab md-warn md-mini" aria-label="Delete" ng-click="deletePatient()">
+            <md-icon md-svg-src="images/ic_delete_24px.svg"></md-icon>
+            <md-tooltip>
+          Delete Patient
+        </md-tooltip>
+        </md-button>
+            </h3>
         <div layout layout-sm="column">
             <p flex>Reg.no/ID: {{patient.id}}</p>
             <p flex>Village: {{patient.village}}</p>
@@ -23,8 +29,24 @@
             <p flex>Blood group: {{patient.bloodGroup | bloodGroupFilter}}</p>
         </div>
         <div layout="column" ng-if="patient.additionalInfo">
-            <p>Additional information</p>
-            <p>{{patient.additionalInfo}}</p>
+            <span flex>Additional information</span>
+            <span flex>{{patient.additionalInfo}}</span>
         </div>
+        <h3>Visit History
+            <md-button class="md-primary md-warn md-mini" aria-label="Add" ng-click="addVisit()">
+            <md-icon md-svg-src="images/ic_add_circle_24px.svg"></md-icon>
+                <md-tooltip>
+                    Add Visit
+                </md-tooltip>
+        </md-button>
+        </h3>
+        <md-list>
+            <md-list-item class="md-2-line" ng-repeat="visit in visits" ng-click="viewVisit(visit, $index)">
+                <div class="md-list-item-text">
+                    <h3>{{ visit.date | date: 'EEE, dd MMMM yy'}}</h3>
+                    <p>{{ (visit.issue.length > 20) ? visit.issue.substring(0,20)+'...' : visit.issue }}</p>
+                </div>
+            </md-list-item>
+        </md-list>
     </md-card-content>
 </md-card>

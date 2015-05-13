@@ -8,19 +8,16 @@
  * Controller of the PayirPatientManagement
  */
 angular.module('PayirPatientManagement')
-    .controller('ViewVisitCtrl', function ($scope, $routeParams, StorageService) {
-
-
-        $scope.visit = {};
-
-        if (!$routeParams.visitId) {
-            $scope.isMissingId = true;
-            return;
+    .controller('ViewVisitCtrl', function ($scope, visit, $mdDialog) {
+        if (visit) {
+            $scope.visit = visit;
         }
 
-        StorageService.getVisit($routeParams.visitId).then(function (visit) {
-            $scope.visit = visit;
-        }, function () {
-            $scope.hasError = true;
-        });
+        $scope.close = function () {
+            $mdDialog.cancel();
+        };
+
+        $scope.delete = function () {
+            $mdDialog.hide($scope.visit.id);
+        };
     });

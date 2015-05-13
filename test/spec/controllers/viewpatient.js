@@ -13,6 +13,18 @@ describe('Controller: ViewPatientCtrl', function () {
         patientId: someExistingPatientId
     };
 
+    var sucPromise = {
+        then: function (callback) {
+            callback();
+        }
+    };
+
+    var failPromise = {
+        then: function (callback, errback) {
+            errback();
+        }
+    };
+
     var someValidPatientObj = {
         id: someExistingPatientId,
         gender: 1,
@@ -67,11 +79,10 @@ describe('Controller: ViewPatientCtrl', function () {
             };
         },
         deletePatient: function () {
-            return {
-                then: function (callback) {
-                    callback();
-                }
-            };
+            return sucPromise;
+        },
+        deleteVisit: function () {
+            return sucPromise;
         }
     };
 
@@ -90,66 +101,10 @@ describe('Controller: ViewPatientCtrl', function () {
         });
     }));
 
-    describe('Delete', function () {
-
-        beforeEach(inject(function ($controller, $rootScope) {
-            scope = $rootScope.$new();
-            ViewPatientCtrl = $controller('ViewPatientCtrl', {
-                $scope: scope,
-                StorageService: StorageService,
-                $routeParams: routeParams,
-            });
-        }));
-
-        it('should provide a delete option', function () {
-            expect(!!scope.deletePatient).toBe(true);
-        });
-
-        it('should show a confirmation dialog', function () {
-            spyOn(StorageService, 'deletePatient').and.callThrough();
-            spyOn(scope, 'showConfirm').and.returnValue({
-                then: function (callback) {
-                    callback();
-                }
-            });
-            scope.deletePatient();
-            expect(scope.showConfirm).toHaveBeenCalled();
-        });
-
-        it('should delete the patient record when delete is confirmed', function () {
-            spyOn(StorageService, 'deletePatient').and.callThrough();
-            spyOn(scope, 'showConfirm').and.returnValue({
-                then: function (callback) {
-                    callback();
-                }
-            });
-            scope.deletePatient();
-            expect(StorageService.deletePatient).toHaveBeenCalled();
-        });
-
-        it('should do nothing when delete is cancelled', function () {
-            spyOn(StorageService, 'deletePatient').and.callThrough();
-            spyOn(scope, 'showConfirm').and.returnValue({
-                then: function (callback, errback) {
-                    if (errback) {
-                        errback();
-                    }
-                }
-            });
-            scope.deletePatient();
-            expect(StorageService.deletePatient).not.toHaveBeenCalled();
-        });
-
-    });
-
-
     describe('Initialization', function () {
 
-        it('should initally have an empty patient object', function () {
-            expect(scope.patient).toEqual({});
-        });
-
-        it('should show an error message when patientId is missing', function () {
+        xit('should show an error message when patientId is missing', function () {
+            expect(routeParams.patientId).not.toBeDefined();
             expect(scope.isMissingId).toBe(true);
         });
 
@@ -208,6 +163,167 @@ describe('Controller: ViewPatientCtrl', function () {
                 expect(scope.hasVisitError).toBe(true);
             });
 
+        });
+    });
+
+    var mdDialog;
+
+
+    describe('Delete', function () {
+
+        beforeEach(inject(function ($controller, $rootScope, $mdDialog) {
+            scope = $rootScope.$new();
+            mdDialog = $mdDialog;
+            ViewPatientCtrl = $controller('ViewPatientCtrl', {
+                $mdDialog: mdDialog,
+                $scope: scope,
+                StorageService: StorageService,
+                $routeParams: routeParams,
+            });
+        }));
+
+        it('should provide a delete option', function () {
+            expect(!!scope.deletePatient).toBe(true);
+        });
+
+        it('should show a confirmation dialog', function () {
+            spyOn(StorageService, 'deletePatient').and.callThrough();
+            spyOn(scope, 'showConfirm').and.returnValue(sucPromise);
+            scope.deletePatient();
+            expect(scope.showConfirm).toHaveBeenCalled();
+        });
+
+        it('should delete the patient record when delete is confirmed', function () {
+            spyOn(StorageService, 'deletePatient').and.callThrough();
+            spyOn(scope, 'showConfirm').and.returnValue(sucPromise);
+            scope.deletePatient();
+            expect(StorageService.deletePatient).toHaveBeenCalled();
+        });
+
+        it('should do nothing when delete is cancelled', function () {
+            spyOn(StorageService, 'deletePatient').and.callThrough();
+            spyOn(scope, 'showConfirm').and.returnValue({
+                then: function (callback, errback) {
+                    if (errback) {
+                        errback();
+                    }
+                }
+            });
+            scope.deletePatient();
+            expect(StorageService.deletePatient).not.toHaveBeenCalled();
+        });
+
+    });
+
+    describe('View visit', function () {
+
+        var someVisit = {
+            id: '1234',
+            issue: 'Issue',
+            date: new Date()
+        };
+
+        beforeEach(inject(function ($controller, $rootScope, $mdDialog) {
+            scope = $rootScope.$new();
+            mdDialog = $mdDialog;
+            ViewPatientCtrl = $controller('ViewPatientCtrl', {
+                $mdDialog: mdDialog,
+                $scope: scope,
+                StorageService: StorageService,
+                $routeParams: routeParams,
+            });
+        }));
+
+        it('should be defined', function () {
+            expect(!!scope.viewVisit).toBe(true);
+        });
+
+        it('should show a dialog', function () {
+            spyOn(mdDialog, 'show').and.returnValue({
+                then: function (deleteback, cancelback) {
+                    //Pretend that the user closed the dialog
+                    if (cancelback) {
+                        cancelback();
+                    }
+                }
+            });
+
+            scope.viewVisit(someVisit);
+            expect(mdDialog.show).toHaveBeenCalled();
+        });
+
+        it('should show a delete confirmation dialog when user clicks delete', function () {
+            spyOn(mdDialog, 'show').and.returnValue(sucPromise);
+            spyOn(scope, 'showConfirm').and.returnValue(sucPromise);
+
+            scope.viewVisit(someVisit);
+            expect(scope.showConfirm).toHaveBeenCalled();
+        });
+
+        it('should, on confirmation, delete the visit from DB and show a toast on DB success + dismiss the dialog', function () {
+            spyOn(mdDialog, 'show').and.returnValue(sucPromise);
+            spyOn(scope, 'showConfirm').and.returnValue(sucPromise);
+            spyOn(StorageService, 'deleteVisit').and.returnValue(sucPromise);
+            spyOn(scope, 'showSimpleToast');
+            spyOn(mdDialog, 'hide');
+
+            scope.viewVisit(someVisit);
+            expect(StorageService.deleteVisit).toHaveBeenCalled();
+            expect(scope.showSimpleToast).toHaveBeenCalled();
+            expect(mdDialog.hide).toHaveBeenCalled();
+        });
+
+        it('should, on confirmation, delete the visit from DB and show a toast on DB failure + NOT dismiss the dialog', function () {
+            spyOn(mdDialog, 'show').and.returnValue(sucPromise);
+            spyOn(scope, 'showConfirm').and.returnValue(sucPromise);
+            spyOn(StorageService, 'deleteVisit').and.returnValue(failPromise);
+            spyOn(scope, 'showSimpleToast');
+            spyOn(mdDialog, 'hide');
+
+            scope.viewVisit(someVisit);
+            expect(StorageService.deleteVisit).toHaveBeenCalled();
+            expect(scope.showSimpleToast).toHaveBeenCalled();
+            expect(mdDialog.hide).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Add visit', function () {
+
+        beforeEach(inject(function ($controller, $rootScope, $mdDialog) {
+            scope = $rootScope.$new();
+            mdDialog = $mdDialog;
+            ViewPatientCtrl = $controller('ViewPatientCtrl', {
+                $mdDialog: mdDialog,
+                $scope: scope,
+                StorageService: StorageService,
+                $routeParams: routeParams,
+            });
+        }));
+
+        it('should provide an option to add a new visit', function () {
+            expect(!!scope.addVisit).toBe(true);
+        });
+
+        it('should show the add visit dialog', function () {
+            spyOn(mdDialog, 'show').and.returnValue(sucPromise);
+            scope.addVisit();
+            expect(mdDialog.show).toHaveBeenCalled();
+        });
+
+        it('should add the visit to the existing list of visits', function () {
+            scope.visits = [];
+            var someVisit = {
+                id: '1234',
+                issue: 'Issue',
+                date: new Date()
+            };
+            spyOn(mdDialog, 'show').and.returnValue({
+                then: function (callback) {
+                    callback(someVisit);
+                }
+            });
+            scope.addVisit();
+            expect(scope.visits).toEqual([someVisit]);
         });
     });
 });
