@@ -8,7 +8,7 @@
  * Controller of the PayirPatientManagement
  */
 angular.module('PayirPatientManagement')
-    .controller('AddPatientCtrl', function ($scope, VldService, StorageService, $routeParams) {
+    .controller('AddPatientCtrl', function ($scope, VldService, StorageService, $routeParams, $location) {
 
         $scope.patient = {};
         $scope.hasValErrors = false;
@@ -22,7 +22,7 @@ angular.module('PayirPatientManagement')
                 };
             });
         }, function () {
-            $scope.hasError = true;
+            $scope.showSimpleToast('Failed to load villages');
         });
 
         if ($routeParams.patientId) {
@@ -31,7 +31,10 @@ angular.module('PayirPatientManagement')
             StorageService.getPatient($routeParams.patientId).then(function (patient) {
                 $scope.patient = patient;
                 $scope.villageStr = patient.village;
-                //TODO Deal with selectedVillage;
+                $scope.selectedVillage = {
+                    value: patient.village.toLowerCase(),
+                    display: patient.village
+                };
             }, function () {
                 $scope.hasError = true;
             });
@@ -44,12 +47,11 @@ angular.module('PayirPatientManagement')
             if (VldService.isValidPatient(patient)) {
                 StorageService.savePatient(patient).then(function () {
                     $scope.showSimpleToast('Patient saved');
-                    $scope.clearPatient();
+                    $scope.goTo($location.path().replace('/', ''));
                 }, function () {
                     $scope.showSimpleToast('Save failed! Please try again');
                 });
             } else {
-                console.log('hasValErrors');
                 $scope.hasValErrors = true;
             }
         };

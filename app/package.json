@@ -1,15 +1,22 @@
 {
-    "name": "payirpatientmanagement",
-    "main": "index.html",
-    "version": "0.0.1",
-    "single-instance": true,
-    "window": {
-        "title": "PayirPatientManagement",
-        "width": 1000,
-        "height": 650,
-        "min_width": 1000,
-        "min_height": 650,
-        "toolbar": true
-    },
-    "chromium-args": "--child-clean-exit"
+  "name": "PayirPatientManagement",
+  "main": "index.html",
+  "version": "1.0.0",
+  "single-instance": true,
+  "window": {
+    "title": "Payir Patient Management",
+    "width": 1000,
+    "height": 650,
+    "min_width": 1000,
+    "min_height": 650,
+    "toolbar": false,
+    "icon": "images/ic_payir.png"
+  },
+  "dependencies": {
+    "google-auth-library": "^0.9.5",
+    "googleapis": "^2.0.3",
+    "nedb": "^1.1.2",
+    "open": "^0.0.5"
+  },
+  "chromium-args": "--child-clean-exit"
 }

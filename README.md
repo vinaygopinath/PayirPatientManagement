@@ -1,6 +1,10 @@
 #Payir Patient Management
 
-A patient management system for small organisations that lets you store patient information, visit history and prescriptions, and set up reminders to follow up on patients after a few days, delivered as an SMS to your team using Google Calendar API.
+A patient management system for small organisations/community health centres that supports storing patient information and visit history, and reminders to follow up on patients after a few days, delivered by SMS to a team of health workers using Google Calendar API.
+
+![Image](http://i.imgur.com/NpAwBHO.gif)
+
+If you find this software useful, please consider donating to [Payir](http://payir.org)
 
 #Index
 * <a href="#installation">Installation</a>
@@ -12,7 +16,7 @@ A patient management system for small organisations that lets you store patient 
 
 ##Installation
 
-###Release Build
+###Release Builds
 
 Coming soon
 
@@ -35,13 +39,23 @@ Run the app using
 nw /path/to/app/directory
 ```
 
-To create packages for Windows and Linux, do this
+To create packages for Windows and Linux separately, do this
 ```
-grunt dist-linux #Linux 64-bit
+grunt dist-linux64 #Linux 64-bit
 grunt dist-linux32
 grunt dist-win
 ```
+
+To create all release builds at once, do this
+```
+grunt distAll
+```
 Packages are created in the appropriate `dist` folder
+
+Note: Windows file names have a 260 char limit. The nested dependencies of node_modules can [cause issues while packaging](https://github.com/mllrsohn/node-webkit-builder/issues/107) the Windows release build. To avoid a nw:blank app, install `flatten-packages` (`npm install -g flatten-packages`) and run it on the app directory
+```
+flatten-packages app/
+```
 
 ##Dependencies
 
@@ -57,6 +71,7 @@ This app uses the following external tools and dependencies
         <a href="https://material.angularjs.org/" target="_blank">Material Design</a> by Google
     </li>
 </ul>
+
 ##Licence
 
 The MIT License (MIT)

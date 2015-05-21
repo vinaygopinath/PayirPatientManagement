@@ -19,16 +19,6 @@ angular.module('PayirPatientManagement')
                 var valContactNum = patient.contactNum && patient.contactNum.trim().length >= 5;
                 var valVillage = patient.village && patient.village.trim().length >= 3;
 
-                var valDate, valReason;
-                if (patient.followup) {
-                    var propertiesRequired = true;
-                    if (!patient.followup.date && !patient.followup.reason && !patient.followup.team) {
-                        propertiesRequired = false;
-                    }
-                    valDate = (patient.followup.date) ? (patient.followup.date > new Date()) : propertiesRequired;
-                    valReason = (patient.followup.reason) ? (patient.followup.reason.trim().length >= 5) : propertiesRequired;
-                    valTeam = (patient.followup.team) ? (patient.followup.team.length >= 1) : true;
-                }
                 //                console.log('ID', valId);
                 //                console.log('gender', valGender);
                 //                console.log('name', valName);
@@ -42,10 +32,32 @@ angular.module('PayirPatientManagement')
 
         function isValidVisit(visit) {
             if (visit) {
-                var valRegNum = visit.id && visit.id.trim().length > 0;
+                var valPatientId = visit.patientId && visit.patientId.trim().length > 0;
                 var valDate = visit.date && visit.date instanceof Date;
                 var valIssue = visit.issue && visit.issue.trim().length >= 3;
-                return valRegNum && valDate && valIssue;
+                var valAttended = visit.attendedBy && visit.attendedBy.trim().length >= 3;
+
+                var valFolDate = true,
+                    valMessage = true,
+                    valTeam = true;
+
+                if (visit.smsAlert.date || visit.smsAlert.message || visit.smsAlert.team) {
+                    valFolDate = (visit.smsAlert.date) ? new Date(visit.smsAlert.date) > new Date() : false;
+                    valMessage = (visit.smsAlert.message) ? (visit.smsAlert.message.trim().length >= 5) : false;
+                    valTeam = (visit.smsAlert.team) ? (visit.smsAlert.team.length >= 1) : false;
+                }
+                console.log('Date exists? ', visit.date);
+                console.log('Date is a date? ', visit.date instanceof Date);
+                console.log('valPatientId', valPatientId);
+                console.log('valDate', valDate);
+                console.log('valIssue', valIssue);
+                console.log('valAttended', valAttended);
+
+                console.log('valFolDate', valFolDate);
+                console.log('valMessage', valMessage);
+                console.log('valTeam', valTeam);
+
+                return valPatientId && valDate && valIssue && valAttended && valFolDate && valMessage && valTeam;
             }
             return false;
         }

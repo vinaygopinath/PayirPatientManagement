@@ -1,5 +1,5 @@
 <form name="patientForm">
-    <h2>New Patient
+    <h2>{{isEditing ? 'Edit' : 'New'}} Patient
         <md-button class="md-fab md-primary md-mini" aria-label="Save" ng-click="savePatient(patient)">
     <md-icon md-svg-src="images/ic_save_24px.svg"></md-icon>
             <md-tooltip>
@@ -8,19 +8,27 @@
     </md-button>
     </h2>
     <md-card>
-        <md-card-content>
+        <md-card-content ng-show="hasError">
+            <h3 class="md-warn">No data found!</h3>
+            <p class="md-warn">This patient record does not exist</p>
+        </md-card-content>
+        <md-card-content ng-show="!hasError">
             <div layout layout-sm="column">
                 <md-input-container flex>
                     <label>Name</label>
                     <input name="name" ng-model="patient.name" maxlength="50" minlength="3" md-maxlength="50" md-minlength="3" required>
+                    <!--
                     <ng-messages for="patientForm.name.$error" ng-messages-include="views/errormsgs.html">
-                    </ng-messages>
+</ng-messages>
+-->
                 </md-input-container>
                 <md-input-container flex>
                     <label>Reg. No/ID</label>
                     <input name="id" ng-model="patient.id" maxlength="15" md-maxlength="15" required>
+                    <!--
                     <ng-messages for="patientForm.id.$error" ng-messages-include="views/errormsgs.html">
                     </ng-messages>
+-->
                 </md-input-container>
             </div>
             <div layout layout-sm="column">
@@ -30,8 +38,10 @@
                 <md-input-container flex>
                     <label>Phone number</label>
                     <input name="contactNum" ng-model="patient.contactNum" maxlength="12" minlength="5" md-maxlength="12" md-minlength="5" required>
+                    <!--
                     <ng-messages for="patientForm.contactNum.$error" ng-messages-include="views/errormsgs.html">
                     </ng-messages>
+-->
                 </md-input-container>
             </div>
             <div layout layout-sm="column">
@@ -39,18 +49,20 @@
                     <md-input-container>
                         <label>Age</label>
                         <input name="age" ng-model="patient.age" type="number" min="0" max="110" step="1" required>
+                        <!--
                         <ng-messages for="patientForm.age.$error" ng-messages-include="views/errormsgs.html">
                         </ng-messages>
+-->
                     </md-input-container>
 
-                    <pre>Gender = {{patient.gender}}</pre>
-                    <pre>Gender less than 3 = {{patient.gender < 3}}</pre>
                     <md-radio-group name="gender" ng-model="patient.gender" required>
                         <md-radio-button value="1" aria-label="Female" name="gender">Female</md-radio-button>
                         <md-radio-button value="2" aria-label="Male" name="gender">Male</md-radio-button>
                         <!--  TODO Deal with mimicking CSS style of other ng-messages-->
+                        <!--
                         <ng-messages for="patientForm.gender.$error" ng-messages-include="views/errormsgs.html">
-                        </ng-messages>
+</ng-messages>
+-->
                     </md-radio-group>
                 </div>
                 <div flex layout="column">
@@ -73,8 +85,6 @@
                             <md-radio-button value="8" aria-label="O-">O-</md-radio-button>
                         </md-radio-group>
                     </div>
-                    <!--  TODO Deal with mimicking CSS style of other ng-messages-->
-                    <span class="warning-message" ng-show="!patient.bloodGroup">Blood group is required</span>
                 </div>
             </div>
             <md-input-container flex>
@@ -84,13 +94,15 @@
         </md-card-content>
     </md-card>
 
-    <div layout>
-        <md-button class="md-raised md-primary" ng-click="savePatient(patient)">
-            <label>Save</label>
-        </md-button>
-        <md-button class="md-raised md-warn" ng-click="clearPatient()" ng-show="!isEditing">
-            <label>Clear</label>
-        </md-button>
-        <p class="md-warn" ng-show="hasValErrors">Some inputs are invalid. Please fix them and try again</p>
+    <div layout="column">
+        <p class="md-warn" ng-show="hasValErrors">All fields other than blood group and additional information are required. Please try again</p>
+        <div layout="row">
+            <md-button class="md-raised md-primary" ng-click="savePatient(patient)">
+                <label>Save</label>
+            </md-button>
+            <md-button class="md-raised md-warn" ng-click="clearPatient()" ng-show="!isEditing">
+                <label>Clear</label>
+            </md-button>
+        </div>
     </div>
 </form>

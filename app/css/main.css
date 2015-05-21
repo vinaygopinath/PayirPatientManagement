@@ -33,3 +33,9 @@ md-radio-group.ng-message {
     overflow-y: auto;
     overflow-x: hidden;
 }
+/* Show vertical divider to separate patient list from content area */
+
+.vertical-divider {
+    height: 100%;
+    border-right: 1px solid #DCDCDC;
+}

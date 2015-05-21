@@ -8,30 +8,41 @@
  * Service in the PayirPatientManagement.
  */
 angular.module('PayirPatientManagement')
-    .service('StorageService', function StorageService(VldService, $q) {
+    .service('StorageService', function StorageService(VldService, $q, Err) {
 
         var _cachedPatientDB;
         var _cachedVisitDB;
         var _cachedSettingsDB;
-        var _cachedListPromise;
+        var _cachedPatients;
 
         var PATIENT_DB = 'patient.db';
         var VISIT_DB = 'visit.db';
         var SETTINGS_DB = 'settings.db';
 
         function openDatabase(dbName) {
-            var deferred = $q.defer();
-
-            if (_cachedPatientDB && dbName === PATIENT_DB) {
-                deferred.resolve(_cachedPatientDB);
-                return deferred.promise;
-            } else if (_cachedVisitDB && dbName === VISIT_DB) {
-                deferred.resolve(_cachedVisitDB);
-                return deferred.promise;
-            } else if (_cachedSettingsDB && dbName === SETTINGS_DB) {
-                deferred.resolve(_cachedSettingsDB);
-                return deferred.promise;
+            if (!dbName) {
+                throw new Error('Please specify the database name');
             }
+
+            var dbPromise;
+
+            if (dbName === PATIENT_DB) {
+                if (_cachedPatientDB) {
+                    return _cachedPatientDB.promise;
+                }
+                _cachedPatientDB = dbPromise = $q.defer();
+            } else if (dbName === VISIT_DB) {
+                if (_cachedVisitDB) {
+                    return _cachedVisitDB.promise;
+                }
+                _cachedVisitDB = dbPromise = $q.defer();
+            } else if (dbName === SETTINGS_DB) {
+                if (_cachedSettingsDB) {
+                    return _cachedSettingsDB.promise;
+                }
+                _cachedSettingsDB = dbPromise = $q.defer();
+            }
+
             var Datastore = require('nedb');
             var path = require('path');
             var basePath;
@@ -41,106 +52,115 @@ angular.module('PayirPatientManagement')
                 basePath = '/tmp';
             }
             var db = new Datastore({
-                filename: path.join(basePath, (dbName || 'ppm.db'))
+                filename: path.join(basePath, dbName)
             });
             db.loadDatabase(function (err) {
-                if (err) {
-                    console.log(err);
-                    deferred.reject(err);
+                if (err && err.code === 'ENOENT') {
+
+                    dbPromise.reject(Err.DB_FAIL);
+                } else if (err) {
+                    dbPromise.reject(Err.DB_UNKNOWN);
                 } else {
-                    if (dbName === PATIENT_DB) {
-                        _cachedPatientDB = db;
-                    } else if (dbName === VISIT_DB) {
-                        _cachedVisitDB = db;
-                    } else if (dbName === SETTINGS_DB) {
-                        _cachedSettingsDB = db;
-                    }
-                    deferred.resolve(db);
+                    dbPromise.resolve(db);
                 }
             });
-            return deferred.promise;
+
+            return dbPromise.promise;
         }
 
-        //TODO Accept an argument to provide a subset of properties
-        //TODO Handle empty fetch
-        function getPatients(subset) {
+
+        function _updatePatientsCache(patient) {
+            var pIndex = -1;
+            _cachedPatients.forEach(function (cachedPatient, index) {
+                if (cachedPatient.id === patient.id) {
+                    pIndex = index;
+                }
+            });
+            if (pIndex !== -1) {
+                _cachedPatients[pIndex] = patient;
+            } else {
+                _cachedPatients.push(patient);
+            }
+        }
+
+        function getPatients() {
             var deferred = $q.defer();
-            var projection = (subset) ? {
+
+            if (_cachedPatients) {
+                deferred.resolve(_cachedPatients);
+                return deferred.promise;
+            }
+
+            var projection = {
                 name: 1,
                 village: 1,
                 id: 1,
                 gender: 1
-            } : {};
-
+            };
             openDatabase(PATIENT_DB).then(function (db) {
                 db.find({}, projection, function (err, patients) {
                     if (err) {
                         deferred.reject(err);
-                    } else if (subset) {
-                        _cachedListPromise = deferred;
-                        console.log('Saved promise ', _cachedListPromise);
-                        deferred.notify(patients);
                     } else {
-                        deferred.resolve(patients);
+                        _cachedPatients = patients;
+                        deferred.resolve(patients || []);
                     }
                 });
-            }, function (err) {
-                deferred.reject(err);
             });
             return deferred.promise;
         }
 
-        //TODO Handle empty fetch
         function getPatient(patientId) {
             if (!patientId) {
                 throw new Error('getPatient needs the patientId parameter');
             }
-            console.log('Step 1');
             var deferred = $q.defer();
-            console.log('Step 1A');
             openDatabase(PATIENT_DB).then(function (db) {
-                console.log('Step 2?');
                 db.findOne({
                     id: patientId
                 }, function (err, patient) {
-                    console.log('Step 3?');
                     if (err) {
                         deferred.reject(err);
-                    } else {
+                    } else if (patient) {
                         deferred.resolve(patient);
+                    } else {
+                        deferred.reject(Err.DB_MISSING_OBJ);
                     }
                 });
-            }, function (err) {
-                deferred.reject(err);
             });
             return deferred.promise;
         }
 
-        //TODO Accept a parameter to control save vs update
         function savePatient(patient) {
             if (!patient) {
                 throw new Error('savePatient needs a patient object parameter');
             }
             var deferred = $q.defer();
             if (VldService.isValidPatient(patient)) {
+                if (patient.$$hashkey) {
+                    delete patient.$$hashkey;
+                }
+                var callback = function (err) {
+                    if (err) {
+                        deferred.reject(err);
+                    } else {
+                        _updatePatientsCache(patient);
+                        deferred.resolve();
+                    }
+                };
                 openDatabase(PATIENT_DB).then(function (db) {
-                    db.insert(patient, function (err, savedPatient) {
-                        if (err) {
-                            deferred.reject(err);
-                        } else {
-                            deferred.resolve(savedPatient);
-                            if (_cachedListPromise) {
-                                console.log('Notifying promise');
-                                _cachedListPromise.notify(savedPatient);
-                            }
-                        }
-                    });
-                    console.log(db);
-                }, function (err) {
-                    deferred.reject(err);
+                    if (patient._id) {
+                        db.update({
+                            _id: patient._id
+                        }, patient, {
+                            upsert: true
+                        }, callback);
+                    } else {
+                        db.insert(patient, callback);
+                    }
                 });
             } else {
-                deferred.reject('Validation failed');
+                deferred.reject(Err.DB_VALIDATION_FAILED);
             }
             return deferred.promise;
         }
@@ -160,22 +180,18 @@ angular.module('PayirPatientManagement')
                         deferred.resolve(numRemoved);
                     }
                 });
-            }, function (err) {
-                deferred.reject(err);
             });
             return deferred.promise;
         }
 
-        //TODO Handle empty fetch
         function getVisits(patientId) {
             if (!patientId) {
                 throw new Error('getVisits needs patientId');
             }
             var deferred = $q.defer();
-            console.log('Here');
             openDatabase(VISIT_DB).then(function (db) {
                 db.find({
-                    id: patientId
+                    'patientId': patientId
                 }, function (err, visits) {
                     if (err) {
                         deferred.reject(err);
@@ -184,14 +200,10 @@ angular.module('PayirPatientManagement')
                         deferred.resolve(visits);
                     }
                 });
-            }, function (err) {
-                deferred.reject(err);
             });
-            console.log('Reaching this return');
             return deferred.promise;
         }
 
-        //TODO Handle empty fetch
         function getVisit(visitId) {
             if (!visitId) {
                 throw new Error('getVisit needs visitId');
@@ -199,27 +211,58 @@ angular.module('PayirPatientManagement')
             var deferred = $q.defer();
             openDatabase(VISIT_DB).then(function (db) {
                 db.findOne({
-                    visitId: visitId
+                    '_id': visitId
                 }, function (err, visit) {
                     if (err) {
                         deferred.reject(err);
-                    } else {
-                        visit = visit || {};
+                    } else if (visit) {
                         deferred.resolve(visit);
+                    } else {
+                        deferred.reject(Err.DB_MISSING_OBJ);
                     }
                 });
-            }, function (err) {
-                deferred.reject(err);
             });
             return deferred.promise;
         }
 
-        //TODO Accept a parameter to control save vs update
         function saveVisit(visit) {
             if (!visit) {
                 throw new Error('saveVisit needs a visit object');
             }
+            console.log('saveVisit');
             var deferred = $q.defer();
+            if (VldService.isValidVisit(visit)) {
+                if (visit.$$hashkey) {
+                    delete visit.$$hashkey;
+                }
+                openDatabase(VISIT_DB).then(function (db) {
+
+                    if (visit._id) {
+                        db.update({
+                                '_id': visit._id
+                            }, visit, {
+                                upsert: true
+                            },
+                            function (err) {
+                                if (err) {
+                                    deferred.reject(err);
+                                } else {
+                                    deferred.resolve(visit);
+                                }
+                            });
+                    } else {
+                        db.insert(visit, function (err, newDoc) {
+                            if (err) {
+                                deferred.reject(err);
+                            } else {
+                                deferred.resolve(newDoc);
+                            }
+                        });
+                    }
+                });
+            } else {
+                deferred.reject(Err.DB_VALIDATION_FAILED);
+            }
             return deferred.promise;
         }
 
@@ -232,12 +275,9 @@ angular.module('PayirPatientManagement')
                     } else {
                         settings = settings || {};
                         settings.team = settings.team || [];
-                        //                        settings.lastSync = settings.lastSync || new Date(0);
                         deferred.resolve(settings);
                     }
                 });
-            }, function (err) {
-                deferred.reject(err);
             });
             return deferred.promise;
         }
@@ -258,11 +298,9 @@ angular.module('PayirPatientManagement')
                             deferred.resolve();
                         }
                     });
-                }, function (err) {
-                    deferred.reject(err);
                 });
             } else {
-                deferred.reject('Validation failed');
+                deferred.reject(Err.DB_VALIDATION_FAILED);
             }
 
             return deferred.promise;
@@ -282,12 +320,10 @@ angular.module('PayirPatientManagement')
                 };
 
                 patientDb.count({}, function (err, count) {
-                    console.log('Total Patient count', count);
                     dashboardInfo.patients.total = count;
                 });
 
                 visitDb.count({}, function (err, count) {
-                    console.log('Total visit count', count);
                     dashboardInfo.visits.total = count;
                 });
 
@@ -299,14 +335,12 @@ angular.module('PayirPatientManagement')
                         $gt: firstDay
                     }
                 }, function (err, count) {
-                    console.log('Total visit thisMonth count', count);
                     dashboardInfo.visits.thisMonth = count;
                 });
 
                 console.log(settingsDb);
 
                 deferred.resolve(dashboardInfo);
-                //TODO Provide followUp array
             }, function (err) {
                 deferred.reject(err);
             });
@@ -320,17 +354,14 @@ angular.module('PayirPatientManagement')
                     village: 1
                 }, function (err, patients) {
                     if (err) {
-                        console.log('Error in getVillages');
                         deferred.reject(err);
                     } else {
-                        console.log('patients=', patients);
                         var resArr = [];
                         angular.forEach(patients, function (patient) {
                             if (resArr.indexOf(patient.village) === -1) {
                                 resArr.push(patient.village);
                             }
                         });
-                        console.log('Returning ', resArr);
                         deferred.resolve(resArr);
                     }
                 });
@@ -345,7 +376,7 @@ angular.module('PayirPatientManagement')
             var deferred = $q.defer();
             openDatabase(VISIT_DB).then(function (db) {
                 db.remove({
-                    'id': visitId
+                    '_id': visitId
                 }, {}, function (err, numRemoved) {
                     if (err) {
                         deferred.reject(err);
@@ -353,10 +384,61 @@ angular.module('PayirPatientManagement')
                         deferred.resolve(numRemoved);
                     }
                 });
-            }, function (err) {
-                deferred.reject(err);
             });
-            return deferred;
+            return deferred.promise;
+        }
+
+        function getPendingAlerts() {
+            var deferred = $q.defer();
+            var now = new Date();
+            openDatabase(VISIT_DB).then(function (db) {
+                db.find({
+                    $where: function () {
+                        return !!this.smsAlert.date && !!this.smsAlert.pending && this.smsAlert.date > now && this.smsAlert.pending.length > 0;
+                    }
+                }, function (err, visits) {
+                    if (err) {
+                        deferred.reject(err);
+                    } else {
+
+
+                        visits = visits || [];
+                        var promises = [];
+                        var resArr = [];
+
+                        var findMatchingVisit = function (patient) {
+                            var res;
+                            visits.forEach(function (visit) {
+                                if (visit.patientId === patient.id) {
+                                    res = visit;
+                                    return;
+                                }
+                            });
+                            return res;
+                        };
+
+                        var sucCallback = function (patient) {
+                            resArr.push({
+                                'patient': patient,
+                                'visit': findMatchingVisit(patient)
+                            });
+                        };
+
+                        visits.forEach(function (visit) {
+                            promises.push(getPatient(visit.patientId).then(sucCallback));
+                        });
+
+                        $q.all(promises).finally(function () {
+                            if (resArr.length > 0) {
+                                deferred.resolve(resArr);
+                            } else {
+                                deferred.reject('Unknown issues');
+                            }
+                        });
+                    }
+                });
+            });
+            return deferred.promise;
         }
 
         return {
@@ -372,6 +454,7 @@ angular.module('PayirPatientManagement')
             'saveSettings': saveSettings,
             'getDashboardInfo': getDashboardInfo,
             'getVillages': getVillages,
-            'deleteVisit': deleteVisit
+            'deleteVisit': deleteVisit,
+            'getPendingAlerts': getPendingAlerts
         };
     });

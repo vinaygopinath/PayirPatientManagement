@@ -71,12 +71,12 @@ module.exports = function (grunt) {
             files: ['<%= config.app %>/scripts/{,*/}*.js', 'test/spec/{,*/}*.js']
         },
         copy: {
-            appLinux: {
+            appLinux64: {
                 files: [{
                     expand: true,
                     cwd: '<%= config.app %>',
                     dest: '<%= config.distLinux64 %>/app.nw',
-                    src: '**'
+                    src: ['**', '!node_modules/bower/**', '!node_modules/*grunt*/**', '!node_modules/**/test*/**', '!node_modules/**/doc*/**', '!node_modules/**/example*/**', '!node_modules/**/demo*/**', '!node_modules/**/bin/**', '!node_modules/**/package.json', '!node_modules/**/*.md', '!node_modules/**/*.txt']
         }]
             },
             appLinux32: {
@@ -84,7 +84,7 @@ module.exports = function (grunt) {
                     expand: true,
                     cwd: '<%= config.app %>',
                     dest: '<%= config.distLinux32 %>/app.nw',
-                    src: '**'
+                    src: ['**', '!node_modules/bower/**', '!node_modules/*grunt*/**', '!node_modules/**/test*/**', '!node_modules/**/doc*/**', '!node_modules/**/example*/**', '!node_modules/**/demo*/**', '!node_modules/**/bin/**', '!node_modules/**/package.json', '!node_modules/**/*.md', '!node_modules/**/*.txt']
         }]
             },
             copyWinToTmp: {
@@ -96,7 +96,7 @@ module.exports = function (grunt) {
         }, {
                     expand: true,
                     cwd: '<%= config.app %>',
-                    src: '**',
+                    src: ['**', '!node_modules/bower/**', '!node_modules/*grunt*/**', '!node_modules/**/test*/**', '!node_modules/**/doc*/**', '!node_modules/**/example*/**', '!node_modules/**/demo*/**', '!node_modules/**/bin/**', '!node_modules/**/package.json', '!node_modules/**/*.md', '!node_modules/**/*.txt'],
                     dest: '<%= config.tmp %>/app/'
         }]
             },
@@ -199,7 +199,19 @@ module.exports = function (grunt) {
                 configFile: 'test/karma.conf.js',
                 logLevel: 'INFO'
             }
-        }
+        },
+
+        //        nodewebkit: {
+        //            options: {
+        //                version: '0.12.0',
+        //                build_dir: './build',
+        //                keep_nw: true,
+        //                embed_nw: false,
+        //            },
+        //            src: ['./app/**', '!./app/node_modules/bower/**', '!./app/node_modules/*grunt*/**',
+        //    '!./app/node_modules/**/test*/**', '!./app/node_modules/**/doc*/**', '!./app/node_modules/**/example*/**', '!./app/node_modules/**/demo*/**', '!./app/node_modules/**/bin/**',
+        //    '!./app/node_modules/**/package.json', '!./app/node_modules/**/*.md', '!./app/node_modules/**/*.txt']
+        //        }
         //        useminPrepare: {
         //            distLinux32: {
         //                html: '<%= config.distLinux32 %>/app.nw/index.html',
@@ -322,17 +334,17 @@ module.exports = function (grunt) {
         });
     });
 
-    grunt.registerTask('dist-linux', [
+    grunt.registerTask('dist-linux64', 'Create a Linux 64-bit build', [
     'jshint',
     'clean:distLinux64',
-    'copy:appLinux',
+    'copy:appLinux64',
 //    'useminPrepare:distLinux64',
     'htmlmin:distLinux64',
     'ngAnnotate:distLinux64',
     'createLinuxApp:Linux64'
   ]);
 
-    grunt.registerTask('dist-linux32', [
+    grunt.registerTask('dist-linux32', 'Create a Linux 32-bit build', [
     'jshint',
     'clean:distLinux32',
     'copy:appLinux32',
@@ -342,7 +354,7 @@ module.exports = function (grunt) {
     'createLinuxApp:Linux32'
   ]);
 
-    grunt.registerTask('dist-win', [
+    grunt.registerTask('dist-win', 'Create a Windows build', [
     'jshint',
     'clean:distWin',
     'copy:copyWinToTmp',
@@ -357,9 +369,15 @@ module.exports = function (grunt) {
 //    'compress:finalWindowsApp'
   ]);
 
-    grunt.registerTask('test', [
+    grunt.registerTask('test', 'Lint-check JS files and run unit tests', [
     'jshint',
     'karma'
   ]);
+
+    grunt.registerTask('distAll', 'Create Windows and Linux release builds', [
+        'dist-win',
+        'dist-linux32',
+        'dist-linux64'
+    ])
 
 };

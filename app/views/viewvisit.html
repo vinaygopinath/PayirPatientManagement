@@ -1,4 +1,4 @@
-<md-dialog>
+<md-dialog flex="50">
     <md-dialog-content>
         <h3>Visit Details</h3>
         <div layout layout-sm="column">
@@ -10,7 +10,7 @@
             <span flex>{{::visit.issue}}</span>
         </div>
         <div class="md-actions" layout="row">
-            <md-button ng-click="delete(visit.id)" class="md-warn md-raised">
+            <md-button ng-click="delete(visit._id)" class="md-warn md-raised">
                 Delete
             </md-button>
             <md-button ng-click="close()" class="md-primary md-raised">

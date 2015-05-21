@@ -8,25 +8,34 @@
 </h2>
 <md-card ng-show="hasError">
     <md-card-content>
-        <p class="md-warn">Error loading app settings. Please refresh this app!</p>
+        <p class="md-warn">Error loading app settings. Please reload the app</p>
     </md-card-content>
 </md-card>
 <md-card ng-show="!hasError">
     <md-card-content>
         <div layout="column">
             <h3>Team</h3>
+            <div ng-show="settings.team.length === 0">
+                <!--                <p>Set up your team below, beginning with the admin account. After adding an account, click the Connect button to authorize Payir Patient Management to set up smsAlert SMS events and backup the database. The database will be duplicated in the Google Drive account of the admin.</p>-->
+                <p>Set up your team below, beginning with the admin account. After adding an account, click the Connect button to authorize Payir Patient Management to set up SMS alerts on your Google Calendar</p>
+            </div>
             <form name="teamForm">
-                <div ng-repeat="person in settings.team track by $index" layout="row">
-                    <md-input-container flex="45">
+                <div ng-repeat="person in settings.team track by $index" layout="row" ng-show="settings.team.length > 0">
+                    <md-input-container>
                         <label>Name</label>
                         <input name="name{{$index}}" ng-model="person.name" md-maxlength="50" md-minlength="3" required>
                         <ng-messages for="teamForm.name{{$index}}.$error" ng-messages-include="views/errormsgs.html">
                         </ng-messages>
                     </md-input-container>
-                    <md-input-container flex="45">
+                    <md-input-container>
                         <label>Email</label>
                         <input ng-model="person.email">
                     </md-input-container>
+                    <md-button class="md-primary" aria-label="Connect" ng-click="connectAccount(person, $index)" ng-disabled="person.isAuth">
+                        <label>
+                            {{ person.isAuth ? 'Connected' : ' Connect '}}
+                        </label>
+                    </md-button>
                     <md-button class="md-icon-button" aria-label="Delete" ng-click="settings.team.splice($index,1)">
                         <md-icon md-svg-icon="images/ic_delete_24px.svg"></md-icon>
                     </md-button>
@@ -51,17 +60,31 @@
         </div>
     </md-card-content>
 </md-card>
+<!--
 <md-card ng-show="!hasError">
     <md-card-content>
-        <h3>Google Drive Backup (Sync)</h3>
-        <p>Last synced: {{ settings.lastSync ? (settings.lastSync | date: 'dd MMM yy, hh:mm a') : 'Never' }}</p>
-        <p>
-            <md-button class="md-raised">
-                <label>Sync now</label>
-            </md-button>
-        </p>
+        <h3>Google Services - Calendar and Drive (Sync)</h3>
+        <div ng-show="!hasToken">
+            <p class="md-warn">Not connected to Google Account</p>
+            <div>
+                <p>Connecting your account is necessary to use smsAlert SMS and database backup</p>
+                <md-button class="md-raised" ng-click="connectAccount()">
+                    <label>Connect account</label>
+                </md-button>
+            </div>
+        </div>
+        <div ng-show="hasToken">
+            <p>Last backup sync: {{ settings.lastSync ? (settings.lastSync | date: 'dd MMM yy, hh:mm a') : 'Never' }}</p>
+            <p>
+                <md-button class="md-raised" ng-click="sync()">
+                    <label>Sync now</label>
+                </md-button>
+            </p>
+        </div>
+
     </md-card-content>
 </md-card>
+-->
 <div layout="row" layout-sm="column" ng-show="!hasError">
     <md-button class="md-raised md-primary" ng-click="saveSettings(settings)">
         <label>Save changes</label>

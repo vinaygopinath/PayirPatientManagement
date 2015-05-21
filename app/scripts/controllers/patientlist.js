@@ -8,16 +8,24 @@
  * Controller of the PayirPatientManagement
  */
 angular.module('PayirPatientManagement')
-    .controller('PatientListCtrl', function ($scope, StorageService) {
+    .controller('PatientListCtrl', function ($scope, StorageService, $rootScope) {
 
         $scope.patients = [];
         $scope.searchStr = '';
 
 
-        StorageService.getPatients(true).then(null, function () {
-            $scope.hasError = true;
-        }, function (addedPatient) {
-            $scope.patients = $scope.patients.concat(addedPatient);
+        $scope.getPatients = function () {
+            StorageService.getPatients().then(function (patientArr) {
+                $scope.patients = patientArr;
+            }, function () {
+                $scope.hasError = true;
+            });
+        };
+
+        $scope.getPatients();
+
+        $rootScope.$on('$routeChangeStart', function () {
+            $scope.getPatients();
         });
 
         $scope.search = function (item) {

@@ -1,7 +1,7 @@
 <md-dialog flex="70">
     <md-dialog-content>
         <h2>New Visit
-        <md-button class="md-fab md-primary md-mini" aria-label="Save" ng-click="saveVisit(visit)">
+        <md-button class="md-fab md-primary md-mini" aria-label="Save" ng-click="saveVisit(visit, smsAlert)">
     <md-icon md-svg-src="images/ic_save_24px.svg"></md-icon>
             <md-tooltip>
           Save Visit
@@ -18,8 +18,12 @@
                         <ng-messages for="visitForm.date.$error" ng-messages-include="views/errormsgs.html"></ng-messages>
                     </md-input-container>
                     <md-autocomplete md-no-cache="true" md-selected-item="selectedPerson" md-search-text="personStr" md-items="person in queryTeam(personStr)" md-item-text="person.display" md-floating-label="Attended by">
-                        <span md-highlight-text="personStr">{{person.display}}</span>
+                        <md-item-template>
+                            <span md-highlight-text="personStr">{{person.display}}</span>
+                        </md-item-template>
+                        <ng-messages for="visitForm.date.$error" ng-messages-include="views/errormsgs.html"></ng-messages>
                     </md-autocomplete>
+
                     <md-input-container>
                         <label>Issue</label>
                         <textarea ng-model="visit.issue" columns="1" md-maxlength="300" required></textarea>
@@ -33,40 +37,38 @@
                 </div>
             </form>
 
-            <form name="followupForm" flex="40">
+            <form name="smsAlertForm" flex="40">
                 <h3>Follow-up (Optional)</h3>
-                <pre>Date is {{tempDate}}</pre>
-                <pre>Time is {{tempTime}}</pre>
-                <pre>Date and time is {{visit.date}}</pre>
-                <pre>Alarm will be at {{dateStr}}</pre>
                 <md-input-container>
                     <label>Date</label>
                     <input type="date" name="date" ng-model="tempDate" required>
-                    <ng-messages for="followupForm.date.$error" ng-messages-include="views/errormsgs.html"></ng-messages>
+                    <ng-messages for="smsAlertForm.date.$error" ng-messages-include="views/errormsgs.html"></ng-messages>
                 </md-input-container>
                 <md-input-container>
                     <label>Time</label>
                     <input type="time" name="time" ng-model="tempTime" required>
-                    <ng-messages for="followupForm.time.$error" ng-messages-include="views/errormsgs.html"></ng-messages>
+                    <ng-messages for="smsAlertForm.time.$error" ng-messages-include="views/errormsgs.html"></ng-messages>
                 </md-input-container>
                 <md-input-container>
-                    <label>Reason</label>
-                    <input name="reason" ng-model="followup.reason" required>
-                    <ng-messages for="followupForm.reason.$error" ng-messages-include="views/errormsgs.html"></ng-messages>
+                    <label>Message</label>
+                    <input name="message" ng-model="smsAlert.message" required>
+                    <ng-messages for="smsAlertForm.message.$error" ng-messages-include="views/errormsgs.html"></ng-messages>
                 </md-input-container>
                 <md-chips ng-model="selectedPeople" md-autocomplete-snap md-require-match>
-                    <md-autocomplete md-selected-item="selectedFollowupPerson" md-search-text="followupStr" md-items="person in queryTeam(followupStr)" md-item-text="person.display" placeholder="Select people from team">
+                    <md-autocomplete md-selected-item="selectedSmsAlertPerson" md-search-text="smsAlertStr" md-items="person in queryTeam(smsAlertStr)" md-item-text="person.display" placeholder="Select people from team">
                         <span md-highlight-text="personStr">{{person.display}}</span>
                     </md-autocomplete>
                     <md-chip-template>
                         <strong>{{$chip.display}}</strong>
                     </md-chip-template>
+                    <ng-messages for="visitForm.charges.$error" ng-messages-include="views/errormsgs.html"></ng-messages>
                 </md-chips>
             </form>
         </div>
 
         <div class="md-actions" layout="row">
-            <md-button ng-click="saveVisit(visit)" class="md-primary md-raised">
+            <p class="md-warn" ng-show="hasValErrors">Some inputs are missing or invalid</p>
+            <md-button ng-click="saveVisit(visit, smsAlert)" class="md-primary md-raised">
                 Save
             </md-button>
             <md-button ng-click="close()" class="md-warn md-raised">

@@ -1,6 +1,6 @@
 <h2>Patient Details</h2>
 <md-card>
-    <md-card-content>
+    <md-card-content ng-show="!hasPatientError">
         <h3>
     {{patient.name}}
         <md-button class="md-fab md-primary md-mini" aria-label="Edit" ng-click="goTo('patient/'+patient.id+'/edit')">
@@ -33,20 +33,31 @@
             <span flex>{{patient.additionalInfo}}</span>
         </div>
         <h3>Visit History
-            <md-button class="md-primary md-warn md-mini" aria-label="Add" ng-click="addVisit()">
+            <md-button class="md-fab md-primary md-mini" aria-label="Add" ng-click="addVisit()">
             <md-icon md-svg-src="images/ic_add_circle_24px.svg"></md-icon>
                 <md-tooltip>
                     Add Visit
                 </md-tooltip>
         </md-button>
         </h3>
-        <md-list>
-            <md-list-item class="md-2-line" ng-repeat="visit in visits" ng-click="viewVisit(visit, $index)">
+        <div ng-show="visits.length === 0">
+            <p>No previous visits</p>
+            <md-button class="md-raised" aria-label="Add" ng-click="addVisit()">
+                <label>Add visit</label>
+            </md-button>
+        </div>
+        <md-list ng-show="visits.length > 0">
+            <md-list-item class="md-2-line" ng-repeat="visit in visits track by $index" ng-click="viewVisit(visit, $index)">
                 <div class="md-list-item-text">
                     <h3>{{ visit.date | date: 'EEE, dd MMMM yy'}}</h3>
                     <p>{{ (visit.issue.length > 20) ? visit.issue.substring(0,20)+'...' : visit.issue }}</p>
                 </div>
             </md-list-item>
         </md-list>
+    </md-card-content>
+
+    <md-card-content ng-show="hasPatientError">
+        <h3 class="md-warn">No data found!</h3>
+        <p class="md-warn">This patient record does not exist</p>
     </md-card-content>
 </md-card>

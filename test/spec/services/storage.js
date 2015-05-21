@@ -8,38 +8,39 @@ describe('Service: StorageService', function () {
     var SETTINGS_DB = 'settings.db';
     var TEST_DB = 'test.db';
 
+    //TODO [Critical] Rewrite tests 
+
     // load the service's module
     beforeEach(angular.mock.module('PayirPatientManagement'));
-    //    var deferred = function () {
-    //        return {
-    //            promise: {
-    //                then: function (callback) {
-    //                    callback();
-    //                }
-    //            },
-    //            reject: function () {},
-    //            resolve: function () {}
-    //        };
-    //    };
-    //    var q = {
-    //        defer: deferred
-    //    };
-    //
-    //    beforeEach(function () {
-    //
-    //        angular.mock.module(function ($provide) {
-    //            $provide.value('$q', q);
-    //        });
-    //
-    //    });
+    var deferred = function () {
+        return {
+            promise: {
+                then: function (callback) {
+                    callback();
+                }
+            },
+            reject: function () {},
+            resolve: function () {}
+        };
+    };
+    var q = {
+        defer: deferred
+    };
+
+    beforeEach(function () {
+
+        angular.mock.module(function ($provide) {
+            $provide.value('$q', q);
+        });
+
+    });
 
     // instantiate service
-    var StorageService, VldService, rootScope, Datastore, q, spiedOpenDatabase;
-    beforeEach(inject(function ($rootScope, _VldService_, _StorageService_, $q) {
+    var StorageService, VldService, rootScope, Datastore, spiedOpenDatabase;
+    beforeEach(inject(function ($rootScope, _VldService_, _StorageService_) {
         rootScope = $rootScope;
         StorageService = _StorageService_;
         Datastore = require('nedb');
-        q = $q;
         spyOn(q, 'defer').and.callThrough();
         spiedOpenDatabase = spyOn(StorageService, 'openDatabase');
         spiedOpenDatabase.and.callThrough();
@@ -66,17 +67,17 @@ describe('Service: StorageService', function () {
         });
 
         it('should create a promise', function () {
-            StorageService.openDatabase();
+            StorageService.openDatabase(PATIENT_DB);
             expect(q.defer).toHaveBeenCalled();
         });
 
         it('should require the nedb module', function () {
-            StorageService.openDatabase();
+            StorageService.openDatabase(PATIENT_DB);
             expect(window.require).toHaveBeenCalledWith('nedb');
         });
 
         it('should require the path module', function () {
-            StorageService.openDatabase();
+            StorageService.openDatabase(PATIENT_DB);
             expect(window.require).toHaveBeenCalledWith('path');
         });
     });
@@ -129,13 +130,13 @@ describe('Service: StorageService', function () {
         });
 
         xit('should open the patient database', function () {
-            spiedOpenDatabase.and.callFake(function () {
-                return new Datastore({
-                    filename: TEST_DB
-                });
-            });
+            //            .and.callFake(function () {
+            //                return new Datastore({
+            //                    filename: TEST_DB
+            //                });
+            //            });
             StorageService.getPatient('1234');
-            expect(spiedOpenDatabase).toHaveBeenCalled();
+            //expect(openDatabase).toHaveBeenCalled();
 
             //            var fakeDb = {
             //                findOne: function () {}

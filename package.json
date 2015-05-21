@@ -1,11 +1,8 @@
 {
-  "name": "payirpatientmanagement",
-  "version": "0.0.0",
+  "name": "PayirPatientManagement",
+  "version": "1.0.0",
   "description": "",
   "keywords": [],
-  "dependencies": {
-    "nedb": "^1.1.2"
-  },
   "devDependencies": {
     "concat-files": "~0.1.0",
     "grunt": "~0.4.5",
@@ -21,6 +18,7 @@
     "grunt-filerev": "^2.3.1",
     "grunt-karma": "^0.10.1",
     "grunt-ng-annotate": "^0.10.0",
+    "grunt-node-webkit-builder": "^1.0.2",
     "grunt-usemin": "^3.0.0",
     "karma": "^0.12.31",
     "karma-browserify": "^4.1.2",
@@ -34,5 +32,8 @@
   },
   "engines": {
     "node": ">=0.8.0"
+  },
+  "dependencies": {
+    "har-validator": "^1.7.0"
   }
 }

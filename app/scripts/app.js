@@ -10,12 +10,6 @@ angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 
         }).when('/patient/:patientId', {
             templateUrl: 'views/viewpatient.html',
             controller: 'ViewPatientCtrl'
-        }).when('/patient/:patientId/visit/new', {
-            templateUrl: 'views/addvisit.html',
-            controller: 'AddVisitCtrl'
-        }).when('/patient/:patientId/visit/:visitId', {
-            templateUrl: 'views/viewvisit.html',
-            controller: 'ViewVisitCtrl'
         }).when('/dashboard', {
             templateUrl: 'views/dashboard.html',
             controller: 'DashboardCtrl'
@@ -26,7 +20,7 @@ angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 
             redirectTo: '/dashboard'
         });
     })
-    .run(function ($rootScope, $location, $mdToast, $mdDialog) {
+    .run(function ($rootScope, $location, $mdToast, $mdDialog, StorageService, GoogleService) {
         'use strict';
         $rootScope.goTo = function (path) {
             $location.path(path);
@@ -54,4 +48,16 @@ angular.module('PayirPatientManagement', ['ngAnimate', 'ngRoute', 'ngMaterial', 
 
             return $mdDialog.show(confirm);
         };
+
+        if (navigator.onLine) {
+
+            StorageService.getPendingAlerts().then(function (resArr) {
+                if (resArr) {
+                    resArr.forEach(function (obj) {
+                        GoogleService.createEvent(obj.patient, obj.visit);
+                    });
+                }
+            });
+        }
+
     });
