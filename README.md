@@ -1,4 +1,8 @@
-#Payir Patient Management
+# Payir Patient Management
+
+**Deprecation Notice**
+
+Google Calendar discontinued SMS notifications as of 27 June, 2015. As a result, this app may still be used to maintain patient records, but it can no longer be used to send follow-up reminders to health workers via SMS.
 
 A patient management system for small organisations/community health centres that supports storing patient information and visit history, and reminders to follow up on patients after a few days, delivered by SMS to a team of health workers using Google Calendar API.
 
@@ -6,7 +10,7 @@ A patient management system for small organisations/community health centres tha
 
 If you find this software useful, please consider donating to [Payir](http://payir.org)
 
-#Index
+# Index
 * <a href="#installation">Installation</a>
     * <a href="#release-build">Release Build</a>
     * <a href="#development">Development</a>
@@ -14,13 +18,13 @@ If you find this software useful, please consider donating to [Payir](http://pay
 * <a href="#licence">Licence</a>
 
 
-##Installation
+## Installation
 
-###Release Builds
+### Release Builds
 
 Coming soon
 
-###Development
+### Development
 
 Download this repo and set up dependencies using `npm` and `bower`
 
@@ -57,7 +61,7 @@ Note: Windows file names have a 260 char limit. The nested dependencies of node_
 flatten-packages app/
 ```
 
-##Dependencies
+## Dependencies
 
 This app uses the following external tools and dependencies
 <ul>
@@ -72,7 +76,7 @@ This app uses the following external tools and dependencies
     </li>
 </ul>
 
-##Licence
+## Licence
 
 The MIT License (MIT)
 
